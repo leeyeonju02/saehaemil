@@ -37,6 +37,31 @@ const partnerLinks: PartnerLink[] = [
     url: "https://www.kead.or.kr/",
     image: "/images/common/한국장애인고용공단.png",
   },
+  {
+    name: "국민건강보험",
+    url: "www.nhis.or.kr",
+    image: "/images/common/국민건강보험.png",
+  },
+  {
+    name: "전북특별자치도",
+    url: "https://www.jeonbuk.go.kr/index.jeonbuk?contentsSid=1807",
+    image: "/images/common/전북특별자치도.png",
+  },
+  {
+    name: "국민연금",
+    url: "https://www.nps.or.kr/gate.do",
+    image: "/images/common/국민연금.png",
+  },
+  {
+    name: "익산시",
+    url: "https://www.eums.go.kr/index.do",
+    image: "/images/common/익산시.png",
+  },
+  {
+    name: "전북특별자치도교육청",
+    url: "https://www.jeonbuk.go.kr/index.jeonbuk?contentsSid=1807",
+    image: "/images/common/전북특별자치도교육청.png",
+  },
 ];
 
 export default function PartnerSlider() {

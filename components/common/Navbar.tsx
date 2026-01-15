@@ -9,6 +9,7 @@ import {
   Container,
 } from "@mui/material";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 const menuItems = [
@@ -27,22 +28,32 @@ export default function Navbar() {
       position="static"
       sx={{ backgroundColor: "transparent", boxShadow: "none" }}
     >
-      <Container maxWidth="lg">
-        <Toolbar disableGutters sx={{ py: 1 }}>
-          <Typography
-            variant="h6"
+      <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
+        <Toolbar disableGutters sx={{ py: 1, pl: 0 }}>
+          <Box
             component={Link}
             href="/"
             sx={{
               flexGrow: 0,
-              fontWeight: "bold",
               textDecoration: "none",
-              color: "black",
               mr: 4,
+              display: "flex",
+              alignItems: "center",
+              position: "relative",
+              height: { xs: 70, sm: 85, md: 100 },
+              width: { xs: 220, sm: 280, md: 320 },
             }}
           >
-            새해밀
-          </Typography>
+            <Image
+              src="/images/common/mainI.png"
+              alt="새해밀"
+              fill
+              style={{
+                objectFit: "contain",
+              }}
+              sizes="(max-width: 600px) 220px, (max-width: 960px) 280px, 320px"
+            />
+          </Box>
           <Box sx={{ flexGrow: 1, display: "flex", gap: 1 }}>
             {menuItems.map((item) => (
               <Button
