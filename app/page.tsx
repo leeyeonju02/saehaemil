@@ -1,4 +1,5 @@
 import { Box, Container, Typography, Button, Stack } from "@mui/material";
+import PartnerSlider from "@/components/homepage/PartnerSlider";
 
 export default function HomePage() {
   return (
@@ -157,6 +158,11 @@ export default function HomePage() {
           </Stack>
         </Container>
       </Box>
+
+      {/* =========================
+          Partner Links Slider Section
+      ========================== */}
+      <PartnerSlider />
     </Box>
   );
 }

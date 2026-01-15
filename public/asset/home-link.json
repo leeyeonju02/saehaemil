@@ -1,0 +1,27 @@
+[
+  {
+    "name": "국세청",
+    "url": "https://www.nts.go.kr/",
+    "image": "/images/common/국세청.png"
+  },
+  {
+    "name": "국민권익위원회",
+    "url": "https://www.acrc.go.kr/",
+    "image": "/images/common/국민권익위원회.png"
+  },
+  {
+    "name": "보건복지부",
+    "url": "https://www.mohw.go.kr/",
+    "image": "/images/common/보건복지부.png"
+  },
+  {
+    "name": "고용노동부",
+    "url": "https://www.moel.go.kr/index.do",
+    "image": "/images/common/고용노동부.png"
+  },
+  {
+    "name": "한국장애인고용공단",
+    "url": "https://www.kead.or.kr/",
+    "image": "/images/common/한국장애인고용공단.png"
+  }
+]
