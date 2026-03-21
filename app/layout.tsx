@@ -4,8 +4,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
 import { theme } from "./theme";
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
+import { Navbar, Footer } from "@/components/layout";
 import "./globals.css";
 
 const geistSans = Geist({

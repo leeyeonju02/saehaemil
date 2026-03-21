@@ -13,15 +13,15 @@ import { useEffect, useState } from "react";
 
 const footerLinks = {
   about: [
-    { label: "회사소개", path: "/about" },
+    { label: "회사 소개", path: "/about" },
     { label: "연혁", path: "/history" },
-    { label: "활동내역", path: "/activities" },
     { label: "조직도", path: "/organization" },
+    { label: "오시는 길", path: "/location" },
   ],
   support: [
-    { label: "후원 안내", path: "#" },
-    { label: "자원봉사", path: "#" },
-    { label: "협력 기관", path: "#" },
+    { label: "후원 안내", path: "/donation" },
+    { label: "봉사 신청", path: "/volunteer/apply" },
+    { label: "후원/기부금 실적", path: "/donation/records" },
   ],
   legal: [
     { label: "개인정보처리방침", path: "#" },
@@ -60,7 +60,6 @@ export default function Footer() {
             gap: 4,
           }}
         >
-          {/* 회사 정보 */}
           <Box>
             <Typography
               variant="h6"
@@ -87,13 +86,12 @@ export default function Footer() {
             </Stack>
           </Box>
 
-          {/* 빠른 링크 */}
           <Box>
             <Typography
               variant="subtitle1"
               sx={{ color: "white", fontWeight: "bold", mb: 2 }}
             >
-              회사소개
+              기관소개
             </Typography>
             <Stack spacing={1}>
               {footerLinks.about.map((link) => (
@@ -113,7 +111,6 @@ export default function Footer() {
             </Stack>
           </Box>
 
-          {/* 후원/협력 */}
           <Box>
             <Typography
               variant="subtitle1"
@@ -139,7 +136,6 @@ export default function Footer() {
             </Stack>
           </Box>
 
-          {/* 법적 정보 */}
           <Box>
             <Typography
               variant="subtitle1"
@@ -177,7 +173,6 @@ export default function Footer() {
 
         <Divider sx={{ my: 4, borderColor: "grey.700" }} />
 
-        {/* 저작권 정보 */}
         <Box
           sx={{
             display: "flex",

@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Container, Typography } from "@mui/material";
-import PostCard from "@/components/common/PostCard";
+import PostCard from "@/components/ui/PostCard";
 import { useEffect, useRef, useState } from "react";
 
 // history 폴더의 이미지 목록
