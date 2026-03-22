@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { Favorite, FavoriteBorder, Comment, Share } from "@mui/icons-material";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export interface PostCardProps {
   /** 게시물 제목 */
@@ -52,27 +52,51 @@ export default function PostCard({
   author,
   clickable = false,
   height = "auto",
-  likes: initialLikes = Math.floor(Math.random() * 100) + 10,
-  comments: initialComments = Math.floor(Math.random() * 50) + 5,
+  /** SSR/클라이언트 일치를 위해 기본값은 고정 (랜덤 사용 금지) */
+  likes: initialLikes = 42,
+  comments: initialComments = 12,
 }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(initialLikes);
+  /** 상대 시간은 마운트 후에만 계산 — 서버/첫 렌더와 하이드레이션 불일치 방지 */
+  const [timeLabel, setTimeLabel] = useState<string | null>(null);
 
-  // 더미 시간 데이터 생성
-  const getTimeAgo = () => {
+  const getDummyTimeAgo = () => {
     const hours = Math.floor(Math.random() * 24);
     if (hours === 0) {
       const minutes = Math.floor(Math.random() * 60);
       return minutes === 0 ? "방금 전" : `${minutes}분 전`;
-    } else if (hours < 24) {
-      return `${hours}시간 전`;
-    } else {
-      const days = Math.floor(hours / 24);
-      return `${days}일 전`;
     }
+    if (hours < 24) {
+      return `${hours}시간 전`;
+    }
+    const days = Math.floor(hours / 24);
+    return `${days}일 전`;
   };
 
-  const timeAgo = date || getTimeAgo();
+  /** ISO 등 절대 시각 → 상대 문자열 (클라이언트에서만 호출) */
+  const formatRelativeFromDateString = (value: string) => {
+    const t = Date.parse(value);
+    if (Number.isNaN(t)) return value;
+    const diffMs = Date.now() - t;
+    const sec = Math.floor(diffMs / 1000);
+    if (sec < 60) return "방금 전";
+    const min = Math.floor(sec / 60);
+    if (min < 60) return `${min}분 전`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr}시간 전`;
+    const day = Math.floor(hr / 24);
+    if (day < 30) return `${day}일 전`;
+    return new Date(t).toLocaleDateString("ko-KR");
+  };
+
+  useEffect(() => {
+    if (date) {
+      setTimeLabel(formatRelativeFromDateString(date));
+    } else {
+      setTimeLabel(getDummyTimeAgo());
+    }
+  }, [date]);
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -222,7 +246,7 @@ export default function PostCard({
         )}
 
         {/* 작성자 및 시간 정보 */}
-        {(author || timeAgo) && (
+        {(author || timeLabel) && (
           <Stack
             direction="row"
             spacing={1}
@@ -241,7 +265,7 @@ export default function PostCard({
                 {author}
               </Typography>
             )}
-            {timeAgo && (
+            {timeLabel && (
               <>
                 {author && (
                   <Typography
@@ -261,7 +285,7 @@ export default function PostCard({
                     textShadow: "0 1px 4px rgba(0,0,0,0.5)",
                   }}
                 >
-                  {timeAgo}
+                  {timeLabel}
                 </Typography>
               </>
             )}

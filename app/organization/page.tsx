@@ -1,16 +1,16 @@
-import { Box, Container, Typography } from "@mui/material";
+import { PageHeader } from "@/components/ui";
+import OrganizationSection from "@/components/sections/organization/OrganizationSection";
+
+export const metadata = {
+  title: "조직도 | 새해밀",
+  description: "새해밀 장애인 활동 지원 센터 조직도",
+};
 
 export default function OrganizationPage() {
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-        조직도
-      </Typography>
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="body1" paragraph>
-          조직도 내용을 여기에 작성하세요.
-        </Typography>
-      </Box>
-    </Container>
+    <>
+      <PageHeader title="조직도" />
+      <OrganizationSection />
+    </>
   );
 }

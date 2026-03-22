@@ -1,16 +1,16 @@
-import { Box, Container, Typography } from "@mui/material";
+import { PageHeader } from "@/components/ui";
+import HistorySection from "@/components/sections/history/HistorySection";
+
+export const metadata = {
+  title: "연혁 | 새해밀",
+  description: "새해밀 장애인 활동 지원 센터 연혁",
+};
 
 export default function HistoryPage() {
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-        연혁
-      </Typography>
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="body1" paragraph>
-          연혁 내용을 여기에 작성하세요.
-        </Typography>
-      </Box>
-    </Container>
+    <>
+      <PageHeader title="연혁" />
+      <HistorySection />
+    </>
   );
 }

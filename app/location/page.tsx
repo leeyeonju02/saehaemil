@@ -1,0 +1,16 @@
+import { PageHeader } from "@/components/ui";
+import LocationSection from "@/components/sections/location/LocationSection";
+
+export const metadata = {
+  title: "오시는 길 | 새해밀",
+  description: "새해밀 장애인 활동 지원 센터 오시는 길",
+};
+
+export default function LocationPage() {
+  return (
+    <>
+      <PageHeader title="오시는 길" description="찾아오시는 길을 안내합니다." />
+      <LocationSection />
+    </>
+  );
+}

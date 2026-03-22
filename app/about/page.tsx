@@ -1,16 +1,16 @@
-import { Box, Container, Typography } from "@mui/material";
+import { PageHeader } from "@/components/ui";
+import AboutSection from "@/components/sections/about/AboutSection";
+
+export const metadata = {
+  title: "회사 소개 | 새해밀",
+  description: "새해밀 장애인 활동 지원 센터 소개",
+};
 
 export default function AboutPage() {
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-        회사소개
-      </Typography>
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="body1" paragraph>
-          회사 소개 내용을 여기에 작성하세요.
-        </Typography>
-      </Box>
-    </Container>
+    <>
+      <PageHeader title="회사 소개" description="새해밀 장애인 활동 지원 센터를 소개합니다." />
+      <AboutSection />
+    </>
   );
 }

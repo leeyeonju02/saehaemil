@@ -4,8 +4,9 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
 import { theme } from "./theme";
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
+import { Navbar, Footer } from "@/components/layout";
+import { AuthProvider } from "@/components/providers";
+import ThemeRegistry from "@/src/theme/ThemeRegistry";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,27 +30,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" style={{ colorScheme: "light" }}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Box
-            suppressHydrationWarning
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              minHeight: "100vh",
-            }}
-          >
-            <Navbar />
-            <Box component="main" sx={{ flexGrow: 1 }}>
-              {children}
-            </Box>
-            <Footer />
-          </Box>
-        </ThemeProvider>
+        <ThemeRegistry>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <AuthProvider>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  minHeight: "100vh",
+                }}
+              >
+                <Navbar />
+                <Box component="main" sx={{ flexGrow: 1 }}>
+                  {children}
+                </Box>
+                <Footer />
+              </Box>
+            </AuthProvider>
+          </ThemeProvider>
+        </ThemeRegistry>
       </body>
     </html>
   );
