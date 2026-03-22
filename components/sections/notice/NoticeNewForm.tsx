@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Box,
   TextField,
@@ -12,22 +13,26 @@ import {
   IconButton,
   Snackbar,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import Link from "next/link";
+import { ADMIN_PW_SESSION_KEY } from "@/lib/auth-storage";
 
 export default function NoticeNewForm() {
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPinned, setIsPinned] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
-    severity: "success" | "info";
+    severity: "success" | "info" | "error";
   }>({ open: false, message: "", severity: "success" });
 
   useEffect(() => {
@@ -53,7 +58,7 @@ export default function NoticeNewForm() {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
       setSnackbar({
@@ -71,13 +76,72 @@ export default function NoticeNewForm() {
       });
       return;
     }
-    // TODO: API로 title, content, files(File[]), isPinned 전송
-    setSnackbar({
-      open: true,
-      message:
-        "폼 검증을 통과했습니다. 실제 등록·저장은 API 연동 후 가능합니다.",
-      severity: "success",
-    });
+
+    let adminPassword: string | null = null;
+    try {
+      adminPassword = sessionStorage.getItem(ADMIN_PW_SESSION_KEY);
+    } catch {
+      adminPassword = null;
+    }
+    if (!adminPassword) {
+      setSnackbar({
+        open: true,
+        message:
+          "등록 인증이 없습니다. 로그아웃 후 관리자 계정으로 다시 로그인해 주세요.",
+        severity: "error",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/notices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: title.trim(),
+          content: content.trim(),
+          is_pinned: isPinned,
+          image_urls: [] as string[],
+          adminPassword,
+        }),
+      });
+      const data = (await res.json()) as { error?: string; id?: string };
+
+      if (!res.ok) {
+        setSnackbar({
+          open: true,
+          message: data.error ?? "저장에 실패했습니다.",
+          severity: "error",
+        });
+        return;
+      }
+
+      if (data.id) {
+        setSnackbar({
+          open: true,
+          message: "공지가 등록되었습니다.",
+          severity: "success",
+        });
+        router.push(`/notice/${data.id}`);
+        router.refresh();
+        return;
+      }
+
+      setSnackbar({
+        open: true,
+        message: "응답이 올바르지 않습니다.",
+        severity: "error",
+      });
+    } catch {
+      setSnackbar({
+        open: true,
+        message: "네트워크 오류가 발생했습니다.",
+        severity: "error",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -132,7 +196,7 @@ export default function NoticeNewForm() {
             이미지 선택
           </Button>
           <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
-            여러 장 선택 가능합니다. (저장 시 서버 업로드 로직이 필요합니다.)
+            여러 장 선택 가능합니다. 현재 버전은 본문·고정만 DB에 저장되며, 이미지는 추후 스토리지 연동 예정입니다.
           </Typography>
           {previewUrls.length > 0 && (
             <Stack direction="row" flexWrap="wrap" gap={2} useFlexGap>
@@ -203,8 +267,18 @@ export default function NoticeNewForm() {
           <Button component={Link} href="/notice" variant="outlined" size="large">
             목록으로
           </Button>
-          <Button type="submit" variant="contained" size="large">
-            등록하기
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            disabled={submitting}
+            startIcon={
+              submitting ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : undefined
+            }
+          >
+            {submitting ? "등록 중…" : "등록하기"}
           </Button>
         </Box>
       </Stack>

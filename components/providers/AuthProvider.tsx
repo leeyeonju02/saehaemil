@@ -12,6 +12,7 @@ import {
   DUMMY_ADMIN_ID,
   DUMMY_ADMIN_PASSWORD,
 } from "@/lib/auth-dummy";
+import { ADMIN_PW_SESSION_KEY } from "@/lib/auth-storage";
 
 const STORAGE_KEY = "saehaemil_auth_v1";
 
@@ -60,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           STORAGE_KEY,
           JSON.stringify({ isAdmin: true } satisfies StoredAuth)
         );
+        sessionStorage.setItem(ADMIN_PW_SESSION_KEY, password);
       } catch {
         /* ignore */
       }
@@ -71,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAdmin(false);
     try {
       localStorage.removeItem(STORAGE_KEY);
+      sessionStorage.removeItem(ADMIN_PW_SESSION_KEY);
     } catch {
       /* ignore */
     }

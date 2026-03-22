@@ -6,6 +6,7 @@ import { Box } from "@mui/material";
 import { theme } from "./theme";
 import { Navbar, Footer } from "@/components/layout";
 import { AuthProvider } from "@/components/providers";
+import ThemeRegistry from "@/src/theme/ThemeRegistry";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,29 +30,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" style={{ colorScheme: "light" }}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <AuthProvider>
-            <Box
-              suppressHydrationWarning
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                minHeight: "100vh",
-              }}
-            >
-              <Navbar />
-              <Box component="main" sx={{ flexGrow: 1 }}>
-                {children}
+        <ThemeRegistry>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <AuthProvider>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  minHeight: "100vh",
+                }}
+              >
+                <Navbar />
+                <Box component="main" sx={{ flexGrow: 1 }}>
+                  {children}
+                </Box>
+                <Footer />
               </Box>
-              <Footer />
-            </Box>
-          </AuthProvider>
-        </ThemeProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </ThemeRegistry>
       </body>
     </html>
   );

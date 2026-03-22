@@ -20,9 +20,13 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import Link from "next/link";
-import { getNotices } from "@/lib/notices";
+import { useRouter } from "next/navigation";
 import type { Notice } from "@/types/notice";
 import { useAuth } from "@/components/providers";
+
+interface NoticeListProps {
+  initialNotices: Notice[];
+}
 
 function formatDate(iso: string) {
   try {
@@ -45,13 +49,14 @@ function filterNotices(notices: Notice[], query: string): Notice[] {
   );
 }
 
-export default function NoticeList() {
+export default function NoticeList({ initialNotices }: NoticeListProps) {
+  const router = useRouter();
   const theme = useTheme();
   const isNarrow = useMediaQuery(theme.breakpoints.down("sm"));
   const { isAdmin, ready } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const allNotices = useMemo(() => getNotices(), []);
+  const allNotices = useMemo(() => initialNotices, [initialNotices]);
   const notices = useMemo(
     () => filterNotices(allNotices, searchQuery),
     [allNotices, searchQuery]
@@ -168,11 +173,17 @@ export default function NoticeList() {
                 <TableRow
                   key={notice.id}
                   hover
-                  component={Link}
-                  href={`/notice/${notice.id}`}
+                  tabIndex={0}
+                  role="link"
+                  aria-label={`${notice.title} 상세 보기`}
+                  onClick={() => router.push(`/notice/${notice.id}`)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      router.push(`/notice/${notice.id}`);
+                    }
+                  }}
                   sx={{
-                    textDecoration: "none",
-                    color: "inherit",
                     cursor: "pointer",
                     "&:last-child td": { borderBottom: 0 },
                     "&:hover": { bgcolor: "action.hover" },

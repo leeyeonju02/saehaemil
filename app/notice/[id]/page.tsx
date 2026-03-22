@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PageHeader, PageSection } from "@/components/ui";
 import { Typography, Box } from "@mui/material";
-import { getNoticeById, getAllNoticeIds } from "@/lib/notices";
+import { loadNoticeById, loadAllNoticeIds } from "@/lib/notices";
 import Link from "next/link";
 import Hero from "@/components/homepage/Hero";
 
@@ -10,13 +10,16 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
-  return getAllNoticeIds().map((id) => ({ id }));
+  const ids = await loadAllNoticeIds();
+  return ids.map((id) => ({ id }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const notice = getNoticeById(id);
+  const notice = await loadNoticeById(id);
   if (!notice) {
     return { title: "공지사항 | 새해밀" };
   }
@@ -28,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function NoticeDetailPage({ params }: Props) {
   const { id } = await params;
-  const notice = getNoticeById(id);
+  const notice = await loadNoticeById(id);
 
   if (!notice) {
     notFound();

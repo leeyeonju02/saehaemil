@@ -9,7 +9,7 @@ export interface NoticeRecord {
   sort_order: number;
   created_at: string;
   updated_at: string;
-  /** 없으면 UI에서 기본값(관리자) 사용 */
+  /** 없으면 UI에서 기본값(새해밀) 사용 */
   author?: string;
 }
 
