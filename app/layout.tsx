@@ -5,6 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
 import { theme } from "./theme";
 import { Navbar, Footer } from "@/components/layout";
+import { AuthProvider } from "@/components/providers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,20 +35,22 @@ export default function RootLayout({
       >
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <Box
-            suppressHydrationWarning
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              minHeight: "100vh",
-            }}
-          >
-            <Navbar />
-            <Box component="main" sx={{ flexGrow: 1 }}>
-              {children}
+          <AuthProvider>
+            <Box
+              suppressHydrationWarning
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                minHeight: "100vh",
+              }}
+            >
+              <Navbar />
+              <Box component="main" sx={{ flexGrow: 1 }}>
+                {children}
+              </Box>
+              <Footer />
             </Box>
-            <Footer />
-          </Box>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

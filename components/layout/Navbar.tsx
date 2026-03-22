@@ -16,14 +16,16 @@ import {
   Collapse,
   Stack,
   Divider,
+  Chip,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, MouseEvent } from "react";
+import { useAuth } from "@/components/providers";
 
 const MOBILE_BREAKPOINT = "md";
 
@@ -76,6 +78,8 @@ function isPathInMenu(pathname: string, children: { path: string }[]) {
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { isAdmin, ready, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -101,6 +105,12 @@ export default function Navbar() {
   };
   const handleSidebarLinkClick = () => {
     setDrawerOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setDrawerOpen(false);
+    router.refresh();
   };
 
   return (
@@ -196,35 +206,46 @@ export default function Navbar() {
             alignItems="center"
             sx={{ ml: { xs: "auto", md: 0 }, flexShrink: 0 }}
           >
-            <Button
-              component={Link}
-              href="/login"
-              size="small"
-              sx={{
-                color: "black",
-                fontWeight: pathname === "/login" ? "bold" : "normal",
-                minWidth: { xs: "auto", sm: 64 },
-                px: { xs: 1, sm: 2 },
-              }}
-            >
-              로그인
-            </Button>
-            <Button
-              component={Link}
-              href="/signup"
-              variant="outlined"
-              size="small"
-              sx={{
-                color: "black",
-                borderColor: "rgba(0,0,0,0.4)",
-                fontWeight: pathname === "/signup" ? "bold" : "normal",
-                minWidth: { xs: "auto", sm: 72 },
-                px: { xs: 1, sm: 2 },
-                "&:hover": { borderColor: "rgba(0,0,0,0.6)" },
-              }}
-            >
-              회원가입
-            </Button>
+            {ready && isAdmin ? (
+              <>
+                <Chip label="관리자" color="secondary" size="small" sx={{ fontWeight: "bold" }} />
+                <Button size="small" variant="outlined" onClick={handleLogout} sx={{ color: "black" }}>
+                  로그아웃
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  component={Link}
+                  href="/login"
+                  size="small"
+                  sx={{
+                    color: "black",
+                    fontWeight: pathname === "/login" ? "bold" : "normal",
+                    minWidth: { xs: "auto", sm: 64 },
+                    px: { xs: 1, sm: 2 },
+                  }}
+                >
+                  로그인
+                </Button>
+                <Button
+                  component={Link}
+                  href="/signup"
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    color: "black",
+                    borderColor: "rgba(0,0,0,0.4)",
+                    fontWeight: pathname === "/signup" ? "bold" : "normal",
+                    minWidth: { xs: "auto", sm: 72 },
+                    px: { xs: 1, sm: 2 },
+                    "&:hover": { borderColor: "rgba(0,0,0,0.6)" },
+                  }}
+                >
+                  회원가입
+                </Button>
+              </>
+            )}
             <IconButton
               aria-label="메뉴 열기"
               onClick={toggleDrawer}
@@ -254,26 +275,35 @@ export default function Navbar() {
         }}
       >
         <Box role="presentation" sx={{ py: 2, px: 1 }}>
-          <Stack direction="row" spacing={1} sx={{ px: 1, mb: 2 }}>
-            <Button
-              component={Link}
-              href="/login"
-              fullWidth
-              variant={pathname === "/login" ? "contained" : "outlined"}
-              onClick={handleSidebarLinkClick}
-            >
-              로그인
-            </Button>
-            <Button
-              component={Link}
-              href="/signup"
-              fullWidth
-              variant={pathname === "/signup" ? "contained" : "outlined"}
-              onClick={handleSidebarLinkClick}
-            >
-              회원가입
-            </Button>
-          </Stack>
+          {ready && isAdmin ? (
+            <Stack spacing={1.5} sx={{ px: 1, mb: 2 }}>
+              <Chip label="관리자로 로그인됨" color="secondary" sx={{ alignSelf: "flex-start" }} />
+              <Button fullWidth variant="outlined" onClick={handleLogout}>
+                로그아웃
+              </Button>
+            </Stack>
+          ) : (
+            <Stack direction="row" spacing={1} sx={{ px: 1, mb: 2 }}>
+              <Button
+                component={Link}
+                href="/login"
+                fullWidth
+                variant={pathname === "/login" ? "contained" : "outlined"}
+                onClick={handleSidebarLinkClick}
+              >
+                로그인
+              </Button>
+              <Button
+                component={Link}
+                href="/signup"
+                fullWidth
+                variant={pathname === "/signup" ? "contained" : "outlined"}
+                onClick={handleSidebarLinkClick}
+              >
+                회원가입
+              </Button>
+            </Stack>
+          )}
           <Divider sx={{ mb: 2 }} />
           <List disablePadding>
             {mainMenu.map((menu, index) => (

@@ -6,17 +6,30 @@ import {
   Button,
   Typography,
   Link as MuiLink,
+  Alert,
 } from "@mui/material";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/providers";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
+  const router = useRouter();
+  const { login } = useAuth();
+  const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: 인증 연동 (features/auth 등)
+    setError(null);
+    const ok = login(loginId, password);
+    if (ok) {
+      router.push("/");
+      router.refresh();
+      return;
+    }
+    setError("아이디 또는 비밀번호가 올바르지 않습니다.");
   };
 
   return (
@@ -25,16 +38,20 @@ export default function LoginForm() {
       onSubmit={handleSubmit}
       sx={{ maxWidth: 400, mx: "auto", mt: 2 }}
     >
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
       <TextField
         fullWidth
         required
-        label="이메일"
-        type="email"
-        name="email"
-        autoComplete="email"
+        label="아이디"
+        name="loginId"
+        autoComplete="username"
         margin="normal"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        value={loginId}
+        onChange={(e) => setLoginId(e.target.value)}
       />
       <TextField
         fullWidth
