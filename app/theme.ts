@@ -6,8 +6,8 @@ export const theme = createTheme({
   palette: {
     mode: "light",
     background: {
-      default: "#ffffff",
-      paper: "#ffffff",
+      default: "#FAF8F5",
+      paper: "#FAF8F5",
     },
     text: {
       primary: "rgba(0, 0, 0, 0.87)",

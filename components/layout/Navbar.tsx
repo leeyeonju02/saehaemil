@@ -135,7 +135,7 @@ export default function Navbar() {
             }}
           >
             <Image
-              src="/images/common/mainI.png"
+              src="/images/common/logo2.png"
               alt="새해밀"
               fill
               style={{
