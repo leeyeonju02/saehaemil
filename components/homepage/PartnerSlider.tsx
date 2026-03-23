@@ -80,7 +80,7 @@ export default function PartnerSlider() {
       component="section"
       sx={{
         py: { xs: 4, md: 6 },
-        bgcolor: "grey.50",
+        bgcolor: "#FFFFFF",
         overflow: "hidden",
       }}
     >
@@ -90,12 +90,25 @@ export default function PartnerSlider() {
           component="h2"
           sx={{
             textAlign: "center",
-            mb: 4,
+            mb: 1,
             fontWeight: "bold",
             color: "text.primary",
           }}
         >
           협력 기관
+        </Typography>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{
+            textAlign: "center",
+            mb: 4,
+            maxWidth: 560,
+            mx: "auto",
+            lineHeight: 1.7,
+          }}
+        >
+          희망나눔 사회복지재단과 함께하는 협력기관입니다
         </Typography>
 
         {/* 슬라이더 컨테이너 */}
