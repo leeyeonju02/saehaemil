@@ -2,6 +2,7 @@
 
 import { Box, Container, Typography, Button, Stack, Chip } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import Link from "next/link";
 
 /** 참고 랜딩과 유사한 포레스트 그린 */
 const HERO_GREEN = "#1B5E20";
@@ -159,6 +160,8 @@ export default function Hero() {
             }}
           >
             <Button
+              component={Link}
+              href="/board"
               variant="contained"
               size="large"
               endIcon={<ArrowForwardIcon sx={{ fontSize: 20 }} />}
@@ -178,9 +181,9 @@ export default function Hero() {
                 },
               }}
             >
-              전화 문의
+              상담 안내
             </Button>
-            <Button
+            {/* <Button
               variant="outlined"
               size="large"
               sx={{
@@ -202,7 +205,7 @@ export default function Hero() {
               }}
             >
               상담 안내
-            </Button>
+            </Button> */}
           </Stack>
         </Stack>
       </Container>

@@ -96,7 +96,7 @@ export default function PartnerSlider() {
           }}
         >
           협력 기관
-        </Typography>
+        </Typography>ㄴ
         <Typography
           variant="body1"
           color="text.secondary"
@@ -108,7 +108,7 @@ export default function PartnerSlider() {
             lineHeight: 1.7,
           }}
         >
-          희망나눔 사회복지재단과 함께하는 협력기관입니다
+          새해밀 장애인 활동지원기관과 함께하는 협력기관입니다
         </Typography>
 
         {/* 슬라이더 컨테이너 */}

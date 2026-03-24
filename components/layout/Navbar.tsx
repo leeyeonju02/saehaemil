@@ -21,9 +21,8 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, MouseEvent } from "react";
 import { useAuth } from "@/components/providers";
 
@@ -78,7 +77,6 @@ function isPathInMenu(pathname: string, children: { path: string }[]) {
 
 export default function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { isAdmin, ready, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -110,7 +108,6 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     setDrawerOpen(false);
-    router.refresh();
   };
 
   return (
@@ -121,11 +118,8 @@ export default function Navbar() {
       <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
         <Toolbar disableGutters sx={{ py: 1, pl: 0 }}>
           <Box
-            component={Link}
-            href="/"
             sx={{
               flexGrow: 0,
-              textDecoration: "none",
               mr: 4,
               display: "flex",
               alignItems: "center",
@@ -189,8 +183,6 @@ export default function Navbar() {
                 mainMenu[openIndex].children.map((sub) => (
                   <MenuItem
                     key={sub.path}
-                    component={Link}
-                    href={sub.path}
                     onClick={handleSubItemClick}
                     selected={pathname === sub.path}
                     sx={{ py: 1.25 }}
@@ -208,29 +200,44 @@ export default function Navbar() {
           >
             {ready && isAdmin ? (
               <>
-                <Chip label="관리자" color="secondary" size="small" sx={{ fontWeight: "bold" }} />
-                <Button size="small" variant="outlined" onClick={handleLogout} sx={{ color: "black" }}>
+                <Chip
+                  label="관리자"
+                  color="secondary"
+                  size="small"
+                  sx={{
+                    fontWeight: "bold",
+                    display: { xs: "none", [MOBILE_BREAKPOINT]: "inline-flex" },
+                  }}
+                />
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={handleLogout}
+                  sx={{
+                    color: "black",
+                    display: { xs: "none", [MOBILE_BREAKPOINT]: "inline-flex" },
+                  }}
+                >
                   로그아웃
                 </Button>
               </>
             ) : (
               <>
                 <Button
-                  component={Link}
-                  href="/login"
+                  type="button"
                   size="small"
                   sx={{
                     color: "black",
                     fontWeight: pathname === "/login" ? "bold" : "normal",
                     minWidth: { xs: "auto", sm: 64 },
                     px: { xs: 1, sm: 2 },
+                    display: { xs: "none", [MOBILE_BREAKPOINT]: "inline-flex" },
                   }}
                 >
                   로그인
                 </Button>
                 <Button
-                  component={Link}
-                  href="/signup"
+                  type="button"
                   variant="outlined"
                   size="small"
                   sx={{
@@ -240,6 +247,7 @@ export default function Navbar() {
                     minWidth: { xs: "auto", sm: 72 },
                     px: { xs: 1, sm: 2 },
                     "&:hover": { borderColor: "rgba(0,0,0,0.6)" },
+                    display: { xs: "none", [MOBILE_BREAKPOINT]: "inline-flex" },
                   }}
                 >
                   회원가입
@@ -285,8 +293,7 @@ export default function Navbar() {
           ) : (
             <Stack direction="row" spacing={1} sx={{ px: 1, mb: 2 }}>
               <Button
-                component={Link}
-                href="/login"
+                type="button"
                 fullWidth
                 variant={pathname === "/login" ? "contained" : "outlined"}
                 onClick={handleSidebarLinkClick}
@@ -294,8 +301,7 @@ export default function Navbar() {
                 로그인
               </Button>
               <Button
-                component={Link}
-                href="/signup"
+                type="button"
                 fullWidth
                 variant={pathname === "/signup" ? "contained" : "outlined"}
                 onClick={handleSidebarLinkClick}
@@ -331,8 +337,6 @@ export default function Navbar() {
                     {menu.children.map((sub) => (
                       <ListItemButton
                         key={sub.path}
-                        component={Link}
-                        href={sub.path}
                         onClick={handleSidebarLinkClick}
                         selected={pathname === sub.path}
                         sx={{ py: 1, borderRadius: 1 }}

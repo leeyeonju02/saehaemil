@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/ui";
 import DonationSection from "@/components/sections/donation/DonationSection";
+import Hero from "@/components/homepage/Hero";
 
 export const metadata = {
   title: "후원안내 | 새해밀",
@@ -9,6 +10,7 @@ export const metadata = {
 export default function DonationPage() {
   return (
     <>
+      <Hero/>
       <PageHeader title="후원안내" description="후원 방법 및 안내입니다." />
       <DonationSection variant="info" />
     </>
