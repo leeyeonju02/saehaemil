@@ -22,7 +22,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, MouseEvent } from "react";
 import { useAuth } from "@/components/providers";
 
@@ -59,6 +60,9 @@ const mainMenu = [
     children: [
       { label: "성희롱 예방", path: "/notice/sexual-harassment" },
       { label: "직장내 괴롭힘", path: "/notice/workplace-bullying" },
+      { label: "안전 및 보건 관리 교육", path: "/notice/safety-health-training" },
+      { label: "재난 대응 교육", path: "/notice/disaster-response-training" },
+      { label: "직장 내 장애인 인식개선", path: "/notice/workplace-disability-awareness" },
     ],
   },
   {
@@ -71,12 +75,30 @@ const mainMenu = [
   },
 ];
 
-function isPathInMenu(pathname: string, children: { path: string }[]) {
-  return children.some((c) => pathname === c.path || pathname.startsWith(c.path + "/"));
+/** 현재 경로와 가장 잘 맞는(경로 문자열이 가장 긴) 상위 메뉴 인덱스 — /notice/* 가 소통의 /notice 와 동시에 잡히는 문제 방지 */
+function getActiveMainMenuIndex(pathname: string): number | null {
+  let bestIndex: number | null = null;
+  let bestLen = -1;
+
+  mainMenu.forEach((menu, menuIndex) => {
+    for (const c of menu.children) {
+      const matches =
+        pathname === c.path || pathname.startsWith(`${c.path}/`);
+      if (!matches) continue;
+      if (c.path.length > bestLen) {
+        bestLen = c.path.length;
+        bestIndex = menuIndex;
+      }
+    }
+  });
+
+  return bestIndex;
 }
 
 export default function Navbar() {
   const pathname = usePathname();
+  const activeMainMenuIndex = getActiveMainMenuIndex(pathname);
+  const router = useRouter();
   const { isAdmin, ready, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -93,16 +115,18 @@ export default function Navbar() {
     setOpenIndex(null);
   };
 
-  const handleSubItemClick = () => {
+  const navigateTo = (path: string) => {
     handleClose();
+    router.push(path);
   };
 
   const toggleDrawer = () => setDrawerOpen((o) => !o);
   const toggleSidebarSection = (index: number) => {
     setSidebarExpanded((prev) => (prev === index ? null : index));
   };
-  const handleSidebarLinkClick = () => {
+  const navigateDrawerTo = (path: string) => {
     setDrawerOpen(false);
+    router.push(path);
   };
 
   const handleLogout = () => {
@@ -118,6 +142,8 @@ export default function Navbar() {
       <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
         <Toolbar disableGutters sx={{ py: 1, pl: 0 }}>
           <Box
+            component={Link}
+            href="/"
             sx={{
               flexGrow: 0,
               mr: 4,
@@ -126,6 +152,7 @@ export default function Navbar() {
               position: "relative",
               height: { xs: 70, sm: 85, md: 100 },
               width: { xs: 220, sm: 280, md: 320 },
+              textDecoration: "none",
             }}
           >
             <Image
@@ -153,11 +180,9 @@ export default function Navbar() {
                 sx={{
                   color: "black",
                   fontWeight:
-                    isPathInMenu(pathname, menu.children) ? "bold" : "normal",
+                    activeMainMenuIndex === index ? "bold" : "normal",
                   textDecoration:
-                    isPathInMenu(pathname, menu.children)
-                      ? "underline"
-                      : "none",
+                    activeMainMenuIndex === index ? "underline" : "none",
                 }}
                 aria-controls={anchorEl && openIndex === index ? "nav-menu" : undefined}
                 aria-haspopup="true"
@@ -183,7 +208,7 @@ export default function Navbar() {
                 mainMenu[openIndex].children.map((sub) => (
                   <MenuItem
                     key={sub.path}
-                    onClick={handleSubItemClick}
+                    onClick={() => navigateTo(sub.path)}
                     selected={pathname === sub.path}
                     sx={{ py: 1.25 }}
                   >
@@ -224,7 +249,8 @@ export default function Navbar() {
             ) : (
               <>
                 <Button
-                  type="button"
+                  component={Link}
+                  href="/login"
                   size="small"
                   sx={{
                     color: "black",
@@ -237,7 +263,8 @@ export default function Navbar() {
                   로그인
                 </Button>
                 <Button
-                  type="button"
+                  component={Link}
+                  href="/signup"
                   variant="outlined"
                   size="small"
                   sx={{
@@ -293,18 +320,20 @@ export default function Navbar() {
           ) : (
             <Stack direction="row" spacing={1} sx={{ px: 1, mb: 2 }}>
               <Button
-                type="button"
+                component={Link}
+                href="/login"
                 fullWidth
                 variant={pathname === "/login" ? "contained" : "outlined"}
-                onClick={handleSidebarLinkClick}
+                onClick={() => setDrawerOpen(false)}
               >
                 로그인
               </Button>
               <Button
-                type="button"
+                component={Link}
+                href="/signup"
                 fullWidth
                 variant={pathname === "/signup" ? "contained" : "outlined"}
-                onClick={handleSidebarLinkClick}
+                onClick={() => setDrawerOpen(false)}
               >
                 회원가입
               </Button>
@@ -321,9 +350,8 @@ export default function Navbar() {
                   <ListItemText
                     primary={menu.label}
                     primaryTypographyProps={{
-                      fontWeight: isPathInMenu(pathname, menu.children)
-                        ? "bold"
-                        : "normal",
+                      fontWeight:
+                        activeMainMenuIndex === index ? "bold" : "normal",
                     }}
                   />
                   {sidebarExpanded === index ? (
@@ -337,7 +365,7 @@ export default function Navbar() {
                     {menu.children.map((sub) => (
                       <ListItemButton
                         key={sub.path}
-                        onClick={handleSidebarLinkClick}
+                        onClick={() => navigateDrawerTo(sub.path)}
                         selected={pathname === sub.path}
                         sx={{ py: 1, borderRadius: 1 }}
                       >

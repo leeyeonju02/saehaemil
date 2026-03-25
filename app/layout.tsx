@@ -33,6 +33,7 @@ export default function RootLayout({
     <html lang="ko" style={{ colorScheme: "light" }}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <ThemeRegistry>
           <ThemeProvider theme={theme}>
