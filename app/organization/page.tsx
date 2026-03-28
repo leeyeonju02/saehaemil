@@ -1,16 +1,10 @@
-import { PageHeader } from "@/components/ui";
 import OrganizationSection from "@/components/sections/organization/OrganizationSection";
 
 export const metadata = {
   title: "조직도 | 새해밀",
-  description: "새해밀 장애인 활동 지원 센터 조직도",
+  description: "사단법인 새해밀의 조직 구성과 인력 현황을 안내합니다.",
 };
 
 export default function OrganizationPage() {
-  return (
-    <>
-      <PageHeader title="조직도" />
-      <OrganizationSection />
-    </>
-  );
+  return <OrganizationSection />;
 }

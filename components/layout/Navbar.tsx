@@ -139,7 +139,13 @@ export default function Navbar() {
       position="static"
       sx={{ backgroundColor: "transparent", boxShadow: "none" }}
     >
-      <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
+      <Container
+        maxWidth="lg"
+        sx={{
+          pl: { xs: 0.5, sm: 1, md: 1.5 },
+          pr: { xs: 2, sm: 3, md: 4 },
+        }}
+      >
         <Toolbar disableGutters sx={{ py: 1, pl: 0 }}>
           <Box
             component={Link}
