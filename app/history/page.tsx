@@ -1,16 +1,16 @@
-import { PageHeader } from "@/components/ui";
 import HistorySection from "@/components/sections/history/HistorySection";
+import Hero from "@/components/homepage/Hero";
 
 export const metadata = {
   title: "연혁 | 새해밀",
-  description: "새해밀 장애인 활동 지원 센터 연혁",
+  description: "새해밀의 발자취를 소개합니다.",
 };
 
 export default function HistoryPage() {
   return (
-    <>
-      <PageHeader title="연혁" />
+    (<>
+      <Hero/>
       <HistorySection />
-    </>
-  );
+    </>)
+  )
 }

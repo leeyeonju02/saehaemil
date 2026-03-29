@@ -1,4 +1,5 @@
 import OrganizationSection from "@/components/sections/organization/OrganizationSection";
+import Hero from "@/components/homepage/Hero";
 
 export const metadata = {
   title: "조직도 | 새해밀",
@@ -6,5 +7,10 @@ export const metadata = {
 };
 
 export default function OrganizationPage() {
-  return <OrganizationSection />;
+  return (
+  (<>
+    <Hero/>
+     <OrganizationSection />
+  </>)
+  )
 }
