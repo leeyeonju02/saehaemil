@@ -1,6 +1,12 @@
-import { PageHeader } from "@/components/ui";
-import BusinessSection from "@/components/sections/business/BusinessSection";
-import Hero from "@/components/homepage/Hero";
+import { Box } from "@mui/material";
+
+import MandatoryTrainingHero from "@/components/sections/business/MandatoryTrainingHero";
+import MandatoryTrainingIntro from "@/components/sections/business/MandatoryTrainingIntro";
+import MandatoryTrainingTarget from "@/components/sections/business/MandatoryTrainingTarget";
+import MandatoryTrainingCourses from "@/components/sections/business/MandatoryTrainingCourses";
+import MandatoryTrainingFeatures from "@/components/sections/business/MandatoryTrainingFeatures";
+import MandatoryTrainingSchedule from "@/components/sections/business/MandatoryTrainingSchedule";
+import MandatoryTrainingImportance from "@/components/sections/business/MandatoryTrainingImportance";
 
 export const metadata = {
   title: "활동지원사 의무 교육 | 새해밀",
@@ -9,10 +15,14 @@ export const metadata = {
 
 export default function BusinessMandatoryTrainingPage() {
   return (
-    <>
-    <Hero/>
-      <PageHeader title="활동지원사 의무 교육" description="의무 교육 과정 안내입니다." />
-      <BusinessSection title="활동지원사 의무 교육" />
-    </>
+    <Box component="main">
+      <MandatoryTrainingHero />
+      <MandatoryTrainingIntro />
+      <MandatoryTrainingTarget />
+      <MandatoryTrainingCourses />
+      <MandatoryTrainingFeatures />
+      <MandatoryTrainingSchedule />
+      <MandatoryTrainingImportance />
+    </Box>
   );
 }
