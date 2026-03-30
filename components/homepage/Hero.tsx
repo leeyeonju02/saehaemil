@@ -1,13 +1,28 @@
 "use client";
 
-import { Box, Container, Typography, Button, Stack, Chip } from "@mui/material";
+import { useState } from "react";
+import { Box, Container, Typography, Button, Stack, Chip, Popover } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Link from "next/link";
 
 /** 참고 랜딩과 유사한 포레스트 그린 */
 const HERO_GREEN = "#1B5E20";
 
+/** Footer와 동일한 대표 전화 (전화앱 연결) */
+const CONTACT_TEL_HREF = "tel:0638338582";
+
 export default function Hero() {
+  const [consultAnchor, setConsultAnchor] = useState<HTMLElement | null>(null);
+  const consultOpen = Boolean(consultAnchor);
+
+  const handleConsultClick = (event: React.MouseEvent<HTMLElement>) => {
+    setConsultAnchor(event.currentTarget);
+  };
+
+  const handleConsultClose = () => {
+    setConsultAnchor(null);
+  };
+
   return (
     <Box
       sx={{
@@ -159,30 +174,82 @@ export default function Hero() {
               width: "100%",
             }}
           >
-            <Button
-              component={Link}
-              href="/board"
-              variant="contained"
-              size="large"
-              endIcon={<ArrowForwardIcon sx={{ fontSize: 20 }} />}
-              sx={{
-                width: { xs: "100%", sm: "auto" },
-                minWidth: { sm: 200 },
-                py: 1.25,
-                px: 2.5,
-                borderRadius: 2,
-                fontWeight: 700,
-                bgcolor: HERO_GREEN,
-                color: "#fff",
-                boxShadow: "0 8px 24px rgba(27, 94, 32, 0.35)",
-                "&:hover": {
-                  bgcolor: "#156018",
-                  boxShadow: "0 10px 28px rgba(27, 94, 32, 0.45)",
-                },
-              }}
-            >
-              상담 안내
-            </Button>
+            <Box sx={{ width: { xs: "100%", sm: "auto" } }}>
+              <Button
+                variant="contained"
+                size="large"
+                aria-haspopup="true"
+                aria-expanded={consultOpen}
+                aria-controls={consultOpen ? "hero-consult-popover" : undefined}
+                onClick={handleConsultClick}
+                endIcon={<ArrowForwardIcon sx={{ fontSize: 20 }} />}
+                sx={{
+                  width: { xs: "100%", sm: "auto" },
+                  minWidth: { sm: 200 },
+                  py: 1.25,
+                  px: 2.5,
+                  borderRadius: 2,
+                  fontWeight: 700,
+                  bgcolor: HERO_GREEN,
+                  color: "#fff",
+                  boxShadow: "0 8px 24px rgba(27, 94, 32, 0.35)",
+                  "&:hover": {
+                    bgcolor: "#156018",
+                    boxShadow: "0 10px 28px rgba(27, 94, 32, 0.45)",
+                  },
+                }}
+              >
+                상담 안내
+              </Button>
+              <Popover
+                id="hero-consult-popover"
+                open={consultOpen}
+                anchorEl={consultAnchor}
+                onClose={handleConsultClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                transformOrigin={{ vertical: "top", horizontal: "left" }}
+                slotProps={{
+                  paper: {
+                    elevation: 8,
+                    sx: {
+                      mt: 1,
+                      p: 2,
+                      minWidth: { xs: "min(100vw - 32px, 280px)", sm: 260 },
+                      borderRadius: 2,
+                    },
+                  },
+                }}
+              >
+                <Stack spacing={1.5}>
+                  <Button
+                    component="a"
+                    href={CONTACT_TEL_HREF}
+                    fullWidth
+                    variant="contained"
+                    size="medium"
+                    onClick={handleConsultClose}
+                    sx={{
+                      fontWeight: 700,
+                      bgcolor: HERO_GREEN,
+                      "&:hover": { bgcolor: "#156018" },
+                    }}
+                  >
+                    전화안내
+                  </Button>
+                  <Button
+                    component={Link}
+                    href="/board"
+                    fullWidth
+                    variant="outlined"
+                    size="medium"
+                    onClick={handleConsultClose}
+                    sx={{ fontWeight: 700, borderColor: HERO_GREEN, color: HERO_GREEN }}
+                  >
+                    게시판 문의
+                  </Button>
+                </Stack>
+              </Popover>
+            </Box>
             {/* <Button
               variant="outlined"
               size="large"

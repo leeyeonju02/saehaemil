@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/ui";
 import VolunteerApplySection from "@/components/sections/volunteer/VolunteerApplySection";
+import Hero from "@/components/homepage/Hero";
 
 export const metadata = {
   title: "봉사 신청 | 새해밀",
@@ -9,7 +10,8 @@ export const metadata = {
 export default function VolunteerApplyPage() {
   return (
     <>
-      <PageHeader title="봉사 신청" description="봉사 신청 페이지입니다." />
+     <Hero />
+      <PageHeader title="봉사 신청" />
       <VolunteerApplySection />
     </>
   );
