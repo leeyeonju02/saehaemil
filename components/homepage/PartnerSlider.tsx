@@ -96,7 +96,7 @@ export default function PartnerSlider() {
           }}
         >
           협력 기관
-        </Typography>ㄴ
+        </Typography>
         <Typography
           variant="body1"
           color="text.secondary"
