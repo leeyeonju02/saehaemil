@@ -1,11 +1,12 @@
 import type { Notice, NoticeRecord } from "@/types/notice";
 import noticeJson from "@/data/notice.json";
-import { getSupabasePublicConfig } from "@/lib/supabase/env";
-import {
-  fetchAllNoticeIdsFromSupabase,
-  fetchNoticeByIdFromSupabase,
-  fetchNoticesFromSupabase,
-} from "@/lib/notices-supabase";
+// --- Supabase 재연동 시 아래 import 주석 해제 ---
+// import { getSupabasePublicConfig } from "@/lib/supabase/env";
+// import {
+//   fetchAllNoticeIdsFromSupabase,
+//   fetchNoticeByIdFromSupabase,
+//   fetchNoticesFromSupabase,
+// } from "@/lib/notices-supabase";
 import { DEFAULT_NOTICE_AUTHOR } from "@/lib/notices-constants";
 
 function normalize(records: NoticeRecord[]): Notice[] {
@@ -14,6 +15,7 @@ function normalize(records: NoticeRecord[]): Notice[] {
     title: r.title,
     content: r.content,
     image_urls: r.image_urls ?? [],
+    attachments: Array.isArray(r.attachments) ? r.attachments : [],
     author: r.author?.trim() || DEFAULT_NOTICE_AUTHOR,
     created_at: r.created_at,
     updated_at: r.updated_at,
@@ -46,39 +48,47 @@ export function getAllNoticeIdsFromJson(): string[] {
   return allNoticesJson.filter((n) => n.is_visible).map((n) => n.id);
 }
 
-function hasSupabaseEnv(): boolean {
-  const { url, key } = getSupabasePublicConfig();
-  return Boolean(url && key);
-}
+// --- Supabase 재연동 시 아래 함수 주석 해제 ---
+// function hasSupabaseEnv(): boolean {
+//   const { url, key } = getSupabasePublicConfig();
+//   return Boolean(url && key);
+// }
 
-/** Supabase `notices` 우선, 실패·미설정 시 JSON 폴백 */
+/**
+ * 테스트 기간: 로컬 JSON만 사용합니다.
+ * DB 재연동: 상단 Supabase import·hasSupabaseEnv 주석 해제 후, 각 함수에서
+ * `return getNoticesFromJson();` 등을 제거하고 아래 주석 처리된 본문을 되살리세요.
+ */
 export async function loadNotices(): Promise<Notice[]> {
-  if (!hasSupabaseEnv()) return getNoticesFromJson();
-  try {
-    return await fetchNoticesFromSupabase();
-  } catch {
-    return getNoticesFromJson();
-  }
+  return getNoticesFromJson();
+  // if (!hasSupabaseEnv()) return getNoticesFromJson();
+  // try {
+  //   return await fetchNoticesFromSupabase();
+  // } catch {
+  //   return getNoticesFromJson();
+  // }
 }
 
 export async function loadNoticeById(id: string): Promise<Notice | undefined> {
-  if (!hasSupabaseEnv()) return getNoticeByIdFromJson(id);
-  try {
-    const n = await fetchNoticeByIdFromSupabase(id);
-    if (n) return n;
-  } catch {
-    /* fall through */
-  }
   return getNoticeByIdFromJson(id);
+  // if (!hasSupabaseEnv()) return getNoticeByIdFromJson(id);
+  // try {
+  //   const n = await fetchNoticeByIdFromSupabase(id);
+  //   if (n) return n;
+  // } catch {
+  //   /* fall through */
+  // }
+  // return getNoticeByIdFromJson(id);
 }
 
 export async function loadAllNoticeIds(): Promise<string[]> {
-  if (!hasSupabaseEnv()) return getAllNoticeIdsFromJson();
-  try {
-    return await fetchAllNoticeIdsFromSupabase();
-  } catch {
-    return getAllNoticeIdsFromJson();
-  }
+  return getAllNoticeIdsFromJson();
+  // if (!hasSupabaseEnv()) return getAllNoticeIdsFromJson();
+  // try {
+  //   return await fetchAllNoticeIdsFromSupabase();
+  // } catch {
+  //   return getAllNoticeIdsFromJson();
+  // }
 }
 
 /** @deprecated 클라이언트에서는 `initialNotices` prop 사용. 폴백·테스트용 */

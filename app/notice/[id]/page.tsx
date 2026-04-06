@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PageHeader, PageSection } from "@/components/ui";
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, Button, Stack } from "@mui/material";
+import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import { loadNoticeById, loadAllNoticeIds } from "@/lib/notices";
+import { encodePublicPath } from "@/lib/public-file-url";
 import Link from "next/link";
 import Hero from "@/components/homepage/Hero";
 
@@ -87,6 +89,36 @@ export default async function NoticeDetailPage({ params }: Props) {
                   }}
                 />
               ))}
+            </Box>
+          )}
+          {notice.attachments.length > 0 && (
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
+                첨부파일
+              </Typography>
+              <Stack spacing={1} alignItems="stretch">
+                {notice.attachments.map((att) => (
+                  <Button
+                    key={`${att.url}-${att.label}`}
+                    component="a"
+                    href={encodePublicPath(att.url)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="outlined"
+                    size="medium"
+                    startIcon={<InsertDriveFileOutlinedIcon />}
+                    sx={{
+                      justifyContent: "flex-start",
+                      textAlign: "left",
+                      py: 1.25,
+                      borderColor: "divider",
+                      color: "text.primary",
+                    }}
+                  >
+                    {att.label}
+                  </Button>
+                ))}
+              </Stack>
             </Box>
           )}
           <Box

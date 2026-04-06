@@ -1,9 +1,19 @@
+/** 공지에 붙는 문서·스프레드시트 등 (이미지 외 첨부) */
+export interface NoticeAttachment {
+  /** 다운로드/링크에 표시할 이름 */
+  label: string;
+  /** `public` 기준 경로 (예: `/images/files/문서.xlsx`) */
+  url: string;
+}
+
 /** `data/notice.json` 한 행 구조 */
 export interface NoticeRecord {
   id: number;
   title: string;
   content: string;
   image_urls: string[];
+  /** HWP, XLSX 등 첨부 — 없으면 생략 */
+  attachments?: NoticeAttachment[];
   is_visible: boolean;
   is_pinned: boolean;
   sort_order: number;
@@ -19,6 +29,7 @@ export interface Notice {
   title: string;
   content: string;
   image_urls: string[];
+  attachments: NoticeAttachment[];
   author: string;
   created_at: string;
   updated_at: string;

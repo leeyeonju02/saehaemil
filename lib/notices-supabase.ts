@@ -25,11 +25,45 @@ function mapRow(row: Record<string, unknown>): Notice {
     }
   }
 
+  const attRaw = row.attachments;
+  let attachments: { label: string; url: string }[] = [];
+  if (Array.isArray(attRaw)) {
+    attachments = attRaw
+      .map((item) => {
+        if (!item || typeof item !== "object") return null;
+        const o = item as Record<string, unknown>;
+        const label = typeof o.label === "string" ? o.label : "";
+        const url = typeof o.url === "string" ? o.url : "";
+        if (!label || !url) return null;
+        return { label, url };
+      })
+      .filter((x): x is { label: string; url: string } => x !== null);
+  } else if (typeof attRaw === "string") {
+    try {
+      const parsed = JSON.parse(attRaw) as unknown;
+      if (Array.isArray(parsed)) {
+        attachments = parsed
+          .map((item) => {
+            if (!item || typeof item !== "object") return null;
+            const o = item as Record<string, unknown>;
+            const label = typeof o.label === "string" ? o.label : "";
+            const url = typeof o.url === "string" ? o.url : "";
+            if (!label || !url) return null;
+            return { label, url };
+          })
+          .filter((x): x is { label: string; url: string } => x !== null);
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
   return {
     id: String(row.id ?? ""),
     title: String(row.title ?? ""),
     content: String(row.content ?? ""),
     image_urls,
+    attachments,
     author:
       typeof row.author === "string" && row.author.trim()
         ? row.author.trim()
