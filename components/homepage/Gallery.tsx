@@ -11,27 +11,18 @@ import {
   Stack,
 } from "@mui/material";
 import ChevronRight from "@mui/icons-material/ChevronRight";
+import { GALLERY_ALBUMS, getAlbumCover } from "@/lib/gallery-albums";
 
 const ACCENT = "#1B5E20";
 
-const galleryImages = [
-  { image: "/images/history/his1.png", alt: "새해밀 갤러리 이미지 1" },
-  { image: "/images/history/his2.png", alt: "새해밀 갤러리 이미지 2" },
-  { image: "/images/history/his3.png", alt: "새해밀 갤러리 이미지 3" },
-  { image: "/images/history/his4.png", alt: "새해밀 갤러리 이미지 4" },
-  { image: "/images/history/his5.png", alt: "새해밀 갤러리 이미지 5" },
-  { image: "/images/history/his6.png", alt: "새해밀 갤러리 이미지 6" },
-  { image: "/images/history/his7.png", alt: "새해밀 갤러리 이미지 7" },
-  { image: "/images/history/his8.png", alt: "새해밀 갤러리 이미지 8" },
-  { image: "/images/history/his9.png", alt: "새해밀 갤러리 이미지 9" },
-  { image: "/images/history/his10.png", alt: "새해밀 갤러리 이미지 10" },
-];
-
-/** 한 줄에 보이는 개수에 맞춘 카드 너비 (lg에서 약 4장) */
+/** 앨범(폴더) 카드 — 가로 스크롤 한 장 너비 */
 const cardSx = {
   flexShrink: 0,
   width: { xs: 200, sm: 230, md: 270 },
-  height: { xs: 260, sm: 300, md: 340 },
+  height: { xs: 300, sm: 340, md: 380 },
+  display: "flex",
+  flexDirection: "column" as const,
+  overflow: "hidden",
 };
 
 export default function Gallery() {
@@ -121,7 +112,7 @@ export default function Gallery() {
               }}
             >
               프로그램과 행사, 일상 현장에서 새해밀이 함께한 소중한 순간들을
-              모았습니다.
+              앨범별로 모았습니다.
             </Typography>
           </Box>
           <Link href="/gallery" style={{ textDecoration: "none" }}>
@@ -175,44 +166,84 @@ export default function Gallery() {
             },
           }}
         >
-          {galleryImages.map((item, index) => (
-            <Box
-              key={index}
-              sx={{
-                ...cardSx,
-                position: "relative",
-                borderRadius: 2,
-                overflow: "hidden",
-                border: 1,
-                borderColor: "divider",
-                bgcolor: "grey.100",
-                flexShrink: 0,
-                "&:hover .gallery-hover-overlay": {
-                  opacity: 1,
-                },
-              }}
-            >
-              <Image
-                src={item.image}
-                alt={item.alt}
-                fill
-                sizes="(max-width: 600px) 200px, (max-width: 900px) 230px, 270px"
-                style={{ objectFit: "cover" }}
-              />
-              <Box
-                className="gallery-hover-overlay"
-                aria-hidden
-                sx={{
-                  position: "absolute",
-                  inset: 0,
-                  bgcolor: "rgba(0, 0, 0, 0.42)",
-                  opacity: 0,
-                  transition: "opacity 0.28s ease",
-                  pointerEvents: "none",
-                }}
-              />
-            </Box>
-          ))}
+          {GALLERY_ALBUMS.map((album) => {
+            const cover = getAlbumCover(album);
+            return (
+              <Link
+                key={album.id}
+                href={`/gallery/${album.id}`}
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                <Box
+                  sx={{
+                    ...cardSx,
+                    borderRadius: 2,
+                    border: 1,
+                    borderColor: "divider",
+                    bgcolor: "#fff",
+                    "&:hover .gallery-hover-overlay": {
+                      opacity: 1,
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      position: "relative",
+                      flex: 1,
+                      minHeight: 0,
+                    }}
+                  >
+                    <Image
+                      src={cover.src}
+                      alt={cover.alt}
+                      fill
+                      sizes="(max-width: 600px) 200px, (max-width: 900px) 230px, 270px"
+                      style={{ objectFit: "cover" }}
+                    />
+                    <Box
+                      className="gallery-hover-overlay"
+                      aria-hidden
+                      sx={{
+                        position: "absolute",
+                        inset: 0,
+                        bgcolor: "rgba(0, 0, 0, 0.38)",
+                        opacity: 0,
+                        transition: "opacity 0.28s ease",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  </Box>
+                  <Box
+                    sx={{
+                      px: 1.5,
+                      py: 1.25,
+                      borderTop: 1,
+                      borderColor: "divider",
+                      bgcolor: "#fff",
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight={700}
+                      sx={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        lineHeight: 1.35,
+                        color: "text.primary",
+                      }}
+                    >
+                      {album.title}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                      앨범 · {album.images.length}장
+                    </Typography>
+                  </Box>
+                </Box>
+              </Link>
+            );
+          })}
         </Box>
       </Container>
     </Box>

@@ -1,37 +1,119 @@
-import { Typography, Box } from "@mui/material";
+import Image from "next/image";
+import Link from "next/link";
+import { Box, Typography, Paper } from "@mui/material";
+import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import { PageSection } from "@/components/ui";
+import { GALLERY_ALBUMS, getAlbumCover } from "@/lib/gallery-albums";
+import { formatActivityDateLabel, formatCreatedAtLabel } from "@/lib/gallery-dates";
+
+const ACCENT = "#1B5E20";
 
 export default function GallerySection() {
   return (
     <PageSection>
-      <Typography variant="body1" paragraph>
-        사진앨범 내용을 여기에 작성하세요.
-      </Typography>
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(3, 1fr)" },
-          gap: 2,
-          mt: 2,
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "repeat(2, 1fr)",
+            md: "repeat(2, 1fr)",
+            lg: "repeat(3, 1fr)",
+          },
+          gap: { xs: 2, md: 2.5 },
         }}
       >
-        {[1, 2, 3].map((i) => (
-          <Box
-            key={i}
-            sx={{
-              aspectRatio: "1",
-              bgcolor: "grey.200",
-              borderRadius: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Typography variant="caption" color="text.secondary">
-              이미지
-            </Typography>
-          </Box>
-        ))}
+        {GALLERY_ALBUMS.map((album) => {
+          const cover = getAlbumCover(album);
+          return (
+            <Link
+              key={album.id}
+              href={`/gallery/${album.id}`}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <Paper
+                elevation={0}
+                sx={{
+                  borderRadius: 2,
+                  overflow: "hidden",
+                  border: 1,
+                  borderColor: "divider",
+                  bgcolor: "#fff",
+                  transition: "box-shadow 0.2s ease, transform 0.2s ease",
+                  height: "100%",
+                  "&:hover": {
+                    boxShadow: "0 8px 28px rgba(0,0,0,0.1)",
+                    transform: "translateY(-2px)",
+                  },
+                }}
+              >
+              <Box
+                sx={{
+                  position: "relative",
+                  aspectRatio: "16 / 10",
+                  bgcolor: "grey.100",
+                }}
+              >
+                <Image
+                  src={cover.src}
+                  alt={cover.alt}
+                  fill
+                  sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  style={{ objectFit: "cover" }}
+                />
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 12,
+                    left: 12,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.5,
+                    bgcolor: "rgba(27, 94, 32, 0.88)",
+                    color: "#fff",
+                    px: 1.25,
+                    py: 0.5,
+                    borderRadius: 1,
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                  }}
+                >
+                  <FolderOutlinedIcon sx={{ fontSize: 16 }} aria-hidden />
+                  앨범 · {album.images.length}장
+                </Box>
+              </Box>
+              <Box sx={{ p: 2 }}>
+                <Typography variant="h6" component="h2" fontWeight={700} sx={{ mb: 1, color: "text.primary" }}>
+                  {album.title}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                    lineHeight: 1.6,
+                    mb: 1.5,
+                  }}
+                >
+                  {album.content}
+                </Typography>
+                <Typography variant="caption" component="div" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                  <Box component="span" sx={{ color: ACCENT, fontWeight: 600 }}>
+                    활동(봉사)
+                  </Box>{" "}
+                  {formatActivityDateLabel(album.activityDate)}
+                </Typography>
+                <Typography variant="caption" component="div" color="text.disabled" sx={{ mt: 0.5 }}>
+                  등록 {formatCreatedAtLabel(album.createdAt)}
+                </Typography>
+              </Box>
+              </Paper>
+            </Link>
+          );
+        })}
       </Box>
     </PageSection>
   );
