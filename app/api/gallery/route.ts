@@ -54,6 +54,12 @@ export async function POST(request: Request) {
     );
   }
 
+  console.log("[gallery-flow] 4 서버 — DB 저장 시작", {
+    title,
+    activity_date,
+    imageCount: images.length,
+  });
+
   let supabase;
   try {
     supabase = createSupabaseServiceClient();
@@ -101,6 +107,8 @@ export async function POST(request: Request) {
 
   revalidatePath("/gallery");
   revalidatePath(`/gallery/${id}`);
+
+  console.log("[gallery-flow] 4 서버 — DB 저장 완료", { id });
 
   return NextResponse.json({ id });
 }

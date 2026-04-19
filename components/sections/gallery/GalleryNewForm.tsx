@@ -175,9 +175,22 @@ export default function GalleryNewForm() {
 
     setSubmitting(true);
     try {
+      console.log(
+        "[gallery-flow] 1 시작 — 이미지 업로드(발급→Storage 직접 업로드)",
+        { fileCount: files.length }
+      );
       const fromStorage = await uploadGalleryImagesToSupabase(files, adminPassword);
       const imageUrls = fromStorage.map((row) => row.url);
+      console.log("[gallery-flow] 1 완료 — 공개 URL 확보", {
+        urlCount: imageUrls.length,
+        urls: imageUrls,
+      });
 
+      console.log("[gallery-flow] 4 요청 — DB 저장 POST /api/gallery", {
+        title: t,
+        activity_date: activityDate,
+        imageCount: imageUrls.length,
+      });
       const saveRes = await fetch("/api/gallery", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -194,6 +207,8 @@ export default function GalleryNewForm() {
       if (!saveRes.ok || !saveJson.id) {
         throw new Error(saveJson.error ?? "갤러리 저장에 실패했습니다.");
       }
+
+      console.log("[gallery-flow] 4 완료 — DB 저장 성공", { id: saveJson.id });
 
       suppressDraftSaveRef.current = true;
       clearGalleryNewFormDraft();
