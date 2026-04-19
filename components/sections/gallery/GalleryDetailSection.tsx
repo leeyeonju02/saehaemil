@@ -61,28 +61,33 @@ export default function GalleryDetailSection({ album }: { album: GalleryAlbum })
           gap: { xs: 1.5, md: 2 },
         }}
       >
-        {album.images.map((item) => (
-          <Box
-            key={item.src}
-            sx={{
-              position: "relative",
-              aspectRatio: "4 / 3",
-              borderRadius: 2,
-              overflow: "hidden",
-              border: 1,
-              borderColor: "divider",
-              bgcolor: "grey.100",
-            }}
-          >
-            <Image
-              src={item.src}
-              alt={item.alt}
-              fill
-              sizes="(max-width: 600px) 50vw, 33vw"
-              style={{ objectFit: "cover" }}
-            />
-          </Box>
-        ))}
+        {album.images.map((item) => {
+          const remote =
+            item.src.startsWith("http://") || item.src.startsWith("https://");
+          return (
+            <Box
+              key={item.src}
+              sx={{
+                position: "relative",
+                aspectRatio: "4 / 3",
+                borderRadius: 2,
+                overflow: "hidden",
+                border: 1,
+                borderColor: "divider",
+                bgcolor: "grey.100",
+              }}
+            >
+              <Image
+                src={item.src}
+                alt={item.alt}
+                fill
+                sizes="(max-width: 600px) 50vw, 33vw"
+                style={{ objectFit: "cover" }}
+                unoptimized={remote}
+              />
+            </Box>
+          );
+        })}
       </Box>
     </PageSection>
   );

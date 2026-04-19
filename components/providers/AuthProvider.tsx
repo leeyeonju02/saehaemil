@@ -42,6 +42,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const parsed = JSON.parse(raw) as StoredAuth;
         if (parsed?.isAdmin === true) {
           setIsAdmin(true);
+          /**
+           * 새 탭·창에서는 sessionStorage가 비어 업로드 API(adminPassword)만 실패하는 경우가 있음.
+           * 로컬에서 복구된 관리자 세션이면 개발용 비밀번호로 sessionStorage를 맞춤.
+           * (운영에서 ADMIN_WRITE_PASSWORD 사용 시 그 값으로 로그인한 탭과 일치해야 함.)
+           */
+          if (
+            typeof window !== "undefined" &&
+            !sessionStorage.getItem(ADMIN_PW_SESSION_KEY)
+          ) {
+            try {
+              sessionStorage.setItem(ADMIN_PW_SESSION_KEY, DUMMY_ADMIN_PASSWORD);
+            } catch {
+              /* private 모드 등에서 sessionStorage 불가 시 무시 */
+            }
+          }
         }
       }
     } catch {

@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
-import {
-  ALLOWED_IMAGE_MIME_TYPES,
-  MAX_IMAGE_BYTES,
-} from "@/lib/storage/image-upload-config";
 import { uploadPublicImage } from "@/lib/storage/upload-public-image";
 import { verifyImageUploadAuth } from "@/lib/storage/verify-upload-auth";
-import { buildObjectPath } from "@/lib/storage/sanitize-upload-path";
+import { buildUuidStorageObjectPath } from "@/lib/storage/storage-object-path";
+import { validateImageBlob } from "@/lib/storage/validate-image-blob";
 
 export const runtime = "nodejs";
 
@@ -59,30 +56,19 @@ export async function POST(request: Request) {
   }
 
   const blob = fileEntry as Blob;
-  if (blob.size <= 0) {
-    return NextResponse.json({ error: "빈 파일입니다." }, { status: 400 });
+  const validated = validateImageBlob(blob);
+  if (!validated.ok) {
+    return NextResponse.json({ error: validated.error }, { status: 400 });
   }
-
-  if (blob.size > MAX_IMAGE_BYTES) {
-    return NextResponse.json(
-      { error: `파일 크기는 ${MAX_IMAGE_BYTES / 1024 / 1024}MB 이하여야 합니다.` },
-      { status: 400 }
-    );
-  }
-
-  const mime = blob.type || "application/octet-stream";
-  if (!ALLOWED_IMAGE_MIME_TYPES.has(mime)) {
-    return NextResponse.json(
-      { error: "허용되지 않는 이미지 형식입니다. (JPEG, PNG, GIF, WEBP)" },
-      { status: 400 }
-    );
-  }
+  const mime = validated.mime;
 
   const purposeRaw = formData.get("purpose");
   const folder = typeof purposeRaw === "string" ? purposeRaw : "general";
   const originalName =
     typeof File !== "undefined" && fileEntry instanceof File ? fileEntry.name : "upload.jpg";
-  const objectPath = buildObjectPath(folder, originalName);
+  const objectPath = buildUuidStorageObjectPath(folder, originalName, {
+    contentType: mime,
+  });
 
   let bytes: Uint8Array;
   try {

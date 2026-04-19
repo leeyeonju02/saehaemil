@@ -15,6 +15,9 @@ export function sanitizeFilename(original: string): string {
   return cleaned || "image";
 }
 
+/**
+ * @deprecated 새 업로드는 `buildUuidStorageObjectPath` 사용 (원본 파일명을 경로에 포함하지 않음).
+ */
 export function buildObjectPath(folder: string, originalFilename: string): string {
   const safeFolder = sanitizeFolderSegment(folder);
   const name = sanitizeFilename(originalFilename);

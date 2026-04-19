@@ -9,7 +9,6 @@ export const metadata = {
   description: "공지사항 목록",
 };
 
-/** Supabase `notices` 조회 반영을 위해 매 요청 최신 데이터 사용 */
 export const dynamic = "force-dynamic";
 
 export default async function NoticeListPage() {
