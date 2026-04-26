@@ -4,11 +4,14 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { verifyAdminWritePassword } from "@/lib/auth-verify-admin";
 import { NOTICES_TABLE } from "@/lib/notices-constants";
 
+type FileUrlItem = { label?: string; url?: string };
+
 type Body = {
   title?: string;
   content?: string;
   is_pinned?: boolean;
   image_urls?: string[];
+  file_urls?: FileUrlItem[];
   adminPassword?: string;
 };
 
@@ -25,6 +28,16 @@ export async function POST(request: Request) {
   const is_pinned = Boolean(body.is_pinned);
   const image_urls = Array.isArray(body.image_urls)
     ? body.image_urls.filter((u): u is string => typeof u === "string" && u.length > 0)
+    : [];
+  const file_urls = Array.isArray(body.file_urls)
+    ? body.file_urls
+        .map((item) => {
+          const label = typeof item?.label === "string" ? item.label.trim() : "";
+          const url = typeof item?.url === "string" ? item.url.trim() : "";
+          if (!label || !url) return null;
+          return { label, url };
+        })
+        .filter((x): x is { label: string; url: string } => x !== null)
     : [];
 
   if (!title || !content) {
@@ -55,6 +68,7 @@ export async function POST(request: Request) {
     title,
     content,
     image_urls,
+    file_urls,
     is_visible: true,
     is_pinned,
     sort_order: 0,
@@ -88,6 +102,7 @@ export async function POST(request: Request) {
     );
   }
 
+  revalidatePath("/");
   revalidatePath("/notice");
   revalidatePath(`/notice/${id}`);
 

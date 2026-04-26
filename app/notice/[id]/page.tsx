@@ -7,6 +7,7 @@ import { loadNoticeById, loadAllNoticeIds } from "@/lib/notices";
 import { encodePublicPath } from "@/lib/public-file-url";
 import Link from "next/link";
 import Hero from "@/components/homepage/Hero";
+import NoticeDetailAdminBar from "@/components/sections/notice/NoticeDetailAdminBar";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -56,6 +57,7 @@ export default async function NoticeDetailPage({ params }: Props) {
         description={`작성자: ${notice.author} · 등록: ${dateLabel}`}
       />
       <PageSection>
+        <NoticeDetailAdminBar noticeId={notice.id} />
         <Box
           sx={{
             bgcolor: "#FFFFFF",

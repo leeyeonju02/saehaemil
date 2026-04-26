@@ -12,7 +12,9 @@ export interface NoticeRecord {
   title: string;
   content: string;
   image_urls: string[];
-  /** HWP, XLSX 등 첨부 — 없으면 생략 */
+  /** DB `file_urls` 와 동일 구조 — 없으면 `attachments` 사용 */
+  file_urls?: NoticeAttachment[];
+  /** HWP, XLSX 등 첨부(JSON) — 레거시 */
   attachments?: NoticeAttachment[];
   is_visible: boolean;
   is_pinned: boolean;

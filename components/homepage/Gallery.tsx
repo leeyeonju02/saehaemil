@@ -11,9 +11,15 @@ import {
   Stack,
 } from "@mui/material";
 import ChevronRight from "@mui/icons-material/ChevronRight";
-import { GALLERY_ALBUMS, getAlbumCover } from "@/lib/gallery-albums";
+import { getAlbumCover } from "@/lib/gallery-albums";
+import type { GalleryAlbum } from "@/lib/gallery-albums";
 
 const ACCENT = "#1B5E20";
+
+type Props = {
+  /** Supabase `gallery` 테이블에서 조회한 앨범 목록 */
+  albums: GalleryAlbum[];
+};
 
 /** 앨범(폴더) 카드 — 가로 스크롤 한 장 너비 */
 const cardSx = {
@@ -25,7 +31,7 @@ const cardSx = {
   overflow: "hidden",
 };
 
-export default function Gallery() {
+export default function Gallery({ albums }: Props) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -166,40 +172,50 @@ export default function Gallery() {
             },
           }}
         >
-          {GALLERY_ALBUMS.map((album) => {
-            const cover = getAlbumCover(album);
-            return (
-              <Link
-                key={album.id}
-                href={`/gallery/${album.id}`}
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <Box
-                  sx={{
-                    ...cardSx,
-                    borderRadius: 2,
-                    border: 1,
-                    borderColor: "divider",
-                    bgcolor: "#fff",
-                    "&:hover .gallery-hover-overlay": {
-                      opacity: 1,
-                    },
-                  }}
+          {albums.length === 0 ? (
+            <Box sx={{ py: 2, width: "100%", textAlign: "center" }}>
+              <Typography variant="body2" color="text.secondary">
+                등록된 사진 앨범이 없습니다.
+              </Typography>
+            </Box>
+          ) : (
+            albums.map((album) => {
+              const cover = getAlbumCover(album);
+              return (
+                <Link
+                  key={album.id}
+                  href={`/gallery/${album.id}`}
+                  style={{ textDecoration: "none", color: "inherit" }}
                 >
                   <Box
                     sx={{
-                      position: "relative",
-                      flex: 1,
-                      minHeight: 0,
+                      ...cardSx,
+                      borderRadius: 2,
+                      border: 1,
+                      borderColor: "divider",
+                      bgcolor: "#fff",
+                      "&:hover .gallery-hover-overlay": {
+                        opacity: 1,
+                      },
                     }}
                   >
-                    <Image
-                      src={cover.src}
-                      alt={cover.alt}
-                      fill
-                      sizes="(max-width: 600px) 200px, (max-width: 900px) 230px, 270px"
-                      style={{ objectFit: "cover" }}
-                    />
+                    <Box
+                      sx={{
+                        position: "relative",
+                        flex: 1,
+                        minHeight: 0,
+                      }}
+                    >
+                      <Image
+                        src={cover.src}
+                        alt={cover.alt}
+                        fill
+                        sizes="(max-width: 600px) 200px, (max-width: 900px) 230px, 270px"
+                        style={{ objectFit: "cover" }}
+                        unoptimized={
+                          cover.src.startsWith("http://") || cover.src.startsWith("https://")
+                        }
+                      />
                     <Box
                       className="gallery-hover-overlay"
                       aria-hidden
@@ -240,10 +256,11 @@ export default function Gallery() {
                       앨범 · {album.images.length}장
                     </Typography>
                   </Box>
-                </Box>
-              </Link>
-            );
-          })}
+                  </Box>
+                </Link>
+              );
+            })
+          )}
         </Box>
       </Container>
     </Box>

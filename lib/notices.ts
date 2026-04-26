@@ -14,7 +14,11 @@ function normalize(records: NoticeRecord[]): Notice[] {
     title: r.title,
     content: r.content,
     image_urls: r.image_urls ?? [],
-    attachments: Array.isArray(r.attachments) ? r.attachments : [],
+    attachments: Array.isArray(r.file_urls)
+      ? r.file_urls
+      : Array.isArray(r.attachments)
+        ? r.attachments
+        : [],
     author: r.author?.trim() || DEFAULT_NOTICE_AUTHOR,
     created_at: r.created_at,
     updated_at: r.updated_at,
