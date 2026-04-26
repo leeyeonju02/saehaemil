@@ -55,7 +55,7 @@ export default function GalleryCustomDetailClient({ albumId }: { albumId: string
       <PageHeader title={album.title} description="활동 사진 앨범" />
       <GalleryDetailSection album={album} />
       <PageSection>
-        <GalleryAlbumFooterNav />
+        <GalleryAlbumFooterNav albumId={album.id} />
       </PageSection>
     </>
   );

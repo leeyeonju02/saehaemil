@@ -18,6 +18,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { ADMIN_PW_SESSION_KEY } from "@/lib/auth-storage";
 import { MAX_IMAGE_BYTES } from "@/lib/storage/image-upload-config";
 import { uploadGalleryImagesToSupabase } from "@/lib/gallery/upload-images-to-supabase";
+import type { GalleryAlbum } from "@/lib/gallery-albums";
 import {
   clearGalleryNewFormDraft,
   draftEntriesToFiles,
@@ -28,13 +29,20 @@ import {
 
 const DRAFT_SAVE_MS = 500;
 
-export default function GalleryNewForm() {
+type Props = {
+  /** `?edit=id` 로 열었을 때 서버에서 전달된 DB 앨범 (없으면 신규) */
+  initialAlbum: GalleryAlbum | null;
+};
+
+export default function GalleryNewForm({ initialAlbum }: Props) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const suppressDraftSaveRef = useRef(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [activityDate, setActivityDate] = useState("");
+  const [persistedImageUrls, setPersistedImageUrls] = useState<string[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [draftRestored, setDraftRestored] = useState(false);
@@ -46,6 +54,20 @@ export default function GalleryNewForm() {
   }>({ open: false, message: "", severity: "info" });
 
   useEffect(() => {
+    if (initialAlbum) {
+      suppressDraftSaveRef.current = true;
+      clearGalleryNewFormDraft();
+      setTitle(initialAlbum.title);
+      setContent(initialAlbum.content);
+      setActivityDate(initialAlbum.activityDate.slice(0, 10));
+      setPersistedImageUrls(initialAlbum.images.map((i) => i.src));
+      setEditingId(initialAlbum.id);
+      setFiles([]);
+      setDraftRestored(true);
+      return;
+    }
+    setEditingId(null);
+    setPersistedImageUrls([]);
     let cancelled = false;
     (async () => {
       const d = loadGalleryNewFormDraft();
@@ -69,7 +91,7 @@ export default function GalleryNewForm() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialAlbum]);
 
   useEffect(() => {
     const urls = files.map((file) => URL.createObjectURL(file));
@@ -80,6 +102,7 @@ export default function GalleryNewForm() {
   }, [files]);
 
   useEffect(() => {
+    if (initialAlbum) return;
     if (!draftRestored || submitting || suppressDraftSaveRef.current) return;
     const id = window.setTimeout(() => {
       void (async () => {
@@ -105,7 +128,7 @@ export default function GalleryNewForm() {
       })();
     }, DRAFT_SAVE_MS);
     return () => window.clearTimeout(id);
-  }, [draftRestored, submitting, title, content, activityDate, files]);
+  }, [initialAlbum, draftRestored, submitting, title, content, activityDate, files]);
 
   const handlePickImages = () => fileInputRef.current?.click();
 
@@ -132,6 +155,10 @@ export default function GalleryNewForm() {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const removePersistedImageAt = (index: number) => {
+    setPersistedImageUrls((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const t = title.trim();
@@ -148,7 +175,17 @@ export default function GalleryNewForm() {
       setSnackbar({ open: true, message: "활동 날짜를 선택해 주세요.", severity: "info" });
       return;
     }
-    if (files.length === 0) {
+    const isEdit = Boolean(editingId);
+    if (isEdit) {
+      if (persistedImageUrls.length === 0 && files.length === 0) {
+        setSnackbar({
+          open: true,
+          message: "이미지를 한 장 이상 유지하거나 새로 추가해 주세요.",
+          severity: "info",
+        });
+        return;
+      }
+    } else if (files.length === 0) {
       setSnackbar({
         open: true,
         message: "이미지를 한 장 이상 선택해 주세요.",
@@ -175,24 +212,26 @@ export default function GalleryNewForm() {
 
     setSubmitting(true);
     try {
-      console.log(
-        "[gallery-flow] 1 시작 — 이미지 업로드(발급→Storage 직접 업로드)",
-        { fileCount: files.length }
-      );
-      const fromStorage = await uploadGalleryImagesToSupabase(files, adminPassword);
-      const imageUrls = fromStorage.map((row) => row.url);
-      console.log("[gallery-flow] 1 완료 — 공개 URL 확보", {
-        urlCount: imageUrls.length,
-        urls: imageUrls,
-      });
+      const isEdit = Boolean(editingId);
+      let imageUrls: string[];
+      if (files.length > 0) {
+        console.log(
+          "[gallery-flow] 1 시작 — 이미지 업로드(발급→Storage 직접 업로드)",
+          { fileCount: files.length }
+        );
+        const fromStorage = await uploadGalleryImagesToSupabase(files, adminPassword);
+        const newUrls = fromStorage.map((row) => row.url);
+        console.log("[gallery-flow] 1 완료 — 공개 URL 확보", {
+          urlCount: newUrls.length,
+          urls: newUrls,
+        });
+        imageUrls = isEdit ? [...persistedImageUrls, ...newUrls] : newUrls;
+      } else {
+        imageUrls = [...persistedImageUrls];
+      }
 
-      console.log("[gallery-flow] 4 요청 — DB 저장 POST /api/gallery", {
-        title: t,
-        activity_date: activityDate,
-        imageCount: imageUrls.length,
-      });
-      const saveRes = await fetch("/api/gallery", {
-        method: "POST",
+      const saveRes = await fetch(isEdit ? `/api/gallery/${editingId}` : "/api/gallery", {
+        method: isEdit ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: t,
@@ -204,17 +243,22 @@ export default function GalleryNewForm() {
       });
       const saveJson = (await saveRes.json()) as { error?: string; id?: string };
 
-      if (!saveRes.ok || !saveJson.id) {
+      const resultId = saveJson.id ?? (isEdit ? editingId : undefined);
+      if (!saveRes.ok || !resultId) {
         throw new Error(saveJson.error ?? "갤러리 저장에 실패했습니다.");
       }
 
-      console.log("[gallery-flow] 4 완료 — DB 저장 성공", { id: saveJson.id });
+      console.log("[gallery-flow] 4 완료 — DB 저장 성공", { id: resultId });
 
       suppressDraftSaveRef.current = true;
       clearGalleryNewFormDraft();
 
-      setSnackbar({ open: true, message: "앨범이 저장되었습니다.", severity: "success" });
-      router.push(`/gallery/${saveJson.id}`);
+      setSnackbar({
+        open: true,
+        message: isEdit ? "앨범이 수정되었습니다." : "앨범이 저장되었습니다.",
+        severity: "success",
+      });
+      router.push(`/gallery/${resultId}`);
       router.refresh();
     } catch (err) {
       const message =
@@ -304,6 +348,52 @@ export default function GalleryNewForm() {
             여러 장 선택 가능 · 파일당 최대 {MAX_IMAGE_BYTES / 1024 / 1024}MB (JPEG, PNG, GIF,
             WEBP)
           </Typography>
+          {persistedImageUrls.length > 0 && (
+            <Stack direction="row" flexWrap="wrap" gap={2} useFlexGap sx={{ mb: 2 }}>
+              {persistedImageUrls.map((url, index) => (
+                <Box
+                  key={`${url}-${index}`}
+                  sx={{
+                    position: "relative",
+                    width: 160,
+                    height: 120,
+                    borderRadius: 1,
+                    overflow: "hidden",
+                    border: 1,
+                    borderColor: "divider",
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={url}
+                    alt=""
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <IconButton
+                    type="button"
+                    size="small"
+                    aria-label="저장된 이미지 제거"
+                    onClick={() => removePersistedImageAt(index)}
+                    disabled={submitting}
+                    sx={{
+                      position: "absolute",
+                      top: 4,
+                      right: 4,
+                      bgcolor: "rgba(0,0,0,0.5)",
+                      color: "common.white",
+                      "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+                    }}
+                  >
+                    <DeleteOutlineIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              ))}
+            </Stack>
+          )}
           {previewUrls.length > 0 && (
             <Stack direction="row" flexWrap="wrap" gap={2} useFlexGap sx={{ mt: 1 }}>
               {previewUrls.map((url, index) => (
@@ -362,7 +452,11 @@ export default function GalleryNewForm() {
             disabled={submitting}
             startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : undefined}
           >
-            {submitting ? "업로드 중…" : "앨범 저장"}
+            {submitting
+              ? "업로드 중…"
+              : editingId
+                ? "변경 저장"
+                : "앨범 저장"}
           </Button>
         </Stack>
       </Stack>

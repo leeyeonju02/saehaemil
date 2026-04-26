@@ -105,6 +105,7 @@ export async function POST(request: Request) {
     );
   }
 
+  revalidatePath("/");
   revalidatePath("/gallery");
   revalidatePath(`/gallery/${id}`);
 
