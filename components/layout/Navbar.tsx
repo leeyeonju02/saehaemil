@@ -35,7 +35,8 @@ const mainMenu = [
     children: [
       { label: "회사 소개", path: "/about" },
       { label: "연혁", path: "/history" },
-      { label: "조직도", path: "/organization" },
+      { label: "조직도 및 인력현황", path: "/organization" },
+      { label: "시설, 설비현황", path: "/facilities" },
       { label: "오시는 길", path: "/location" },
     ],
   },
@@ -43,8 +44,10 @@ const mainMenu = [
     label: "사업안내",
     children: [
       { label: "복지사업", path: "/business/welfare" },
+      { label: "급여 종류 및 내용 안내", path: "/business/salary-types" },
       { label: "활동지원사 직무 교육", path: "/business/job-training" },
       { label: "활동지원사 의무 교육", path: "/business/mandatory-training" },
+     
     ],
   },
   {

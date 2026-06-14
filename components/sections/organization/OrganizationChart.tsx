@@ -283,6 +283,7 @@ export default function OrganizationChart() {
                   { role: "과장", name: "박규남" },
                   { role: "팀장", name: "이지영" },
                   { role: "대리", name: "심찬미" },
+                  { role: "사원", name: "이성미" }
                 ].map((row) => (
                   <Box
                     key={row.role}
