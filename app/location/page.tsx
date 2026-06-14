@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/ui";
+import LocationHeroBanner from "@/components/sections/location/LocationHeroBanner";
 import LocationSection from "@/components/sections/location/LocationSection";
 
 export const metadata = {
@@ -9,7 +10,7 @@ export const metadata = {
 export default function LocationPage() {
   return (
     <>
-      <PageHeader title="오시는 길" description="찾아오시는 길을 안내합니다." />
+      <LocationHeroBanner />
       <LocationSection />
     </>
   );
