@@ -15,8 +15,8 @@ export const SAEHAEMIL_ADDRESS_SHORT = "전라북도 익산시 무왕로29길 9-
 export const SAEHAEMIL_PHONE = "010-8191-9558";
 export const SAEHAEMIL_PHONE_HREF = "tel:01081919558";
 
-/** OpenStreetMap 기준 대략 좌표 (필요 시 미세 조정) */
-export const SAEHAEMIL_CENTER: [number, number] = [35.94797, 126.95682];
+/** 새해밀 센터 좌표 (위도, 경도) */
+export const SAEHAEMIL_CENTER: [number, number] = [35.96324, 127.00389];
 
 export const SAEHAEMIL_NAVER_MAP_URL = `https://map.naver.com/v5/search/${encodeURIComponent(
   SAEHAEMIL_ADDRESS_SHORT

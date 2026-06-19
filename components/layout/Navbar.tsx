@@ -36,7 +36,7 @@ const mainMenu = [
       { label: "회사 소개", path: "/about" },
       { label: "연혁", path: "/history" },
       { label: "조직도 및 인력현황", path: "/organization" },
-      { label: "시설, 설비현황", path: "/facilities" },
+      { label: "시설/설비현황", path: "/facilities" },
       { label: "오시는 길", path: "/location" },
     ],
   },
@@ -46,7 +46,7 @@ const mainMenu = [
       { label: "복지사업", path: "/business/welfare" },
       { label: "급여 종류 및 내용 안내", path: "/business/salary-types" },
       { label: "활동지원사 직무 교육", path: "/business/job-training" },
-      { label: "활동지원사 의무 교육", path: "/business/mandatory-training" },
+
      
     ],
   },
@@ -59,13 +59,14 @@ const mainMenu = [
     ],
   },
   {
-    label: "알림",
+    label: "법정 필수교육",
     children: [
       { label: "성희롱 예방", path: "/notice/sexual-harassment" },
       { label: "직장내 괴롭힘", path: "/notice/workplace-bullying" },
       { label: "안전 및 보건 관리 교육", path: "/notice/safety-health-training" },
       { label: "재난 대응 교육", path: "/notice/disaster-response-training" },
       { label: "직장 내 장애인 인식개선", path: "/notice/workplace-disability-awareness" },
+      { label: "활동지원사 의무 교육", path: "/business/mandatory-training" },
     ],
   },
   {

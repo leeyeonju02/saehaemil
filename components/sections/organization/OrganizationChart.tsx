@@ -283,7 +283,7 @@ export default function OrganizationChart() {
                   { role: "과장", name: "박규남" },
                   { role: "팀장", name: "이지영" },
                   { role: "대리", name: "심찬미" },
-                  { role: "사원", name: "이성미" }
+                  { role: "전담인력", name: "이성미" }
                 ].map((row) => (
                   <Box
                     key={row.role}
@@ -369,7 +369,7 @@ export default function OrganizationChart() {
                 장애인활동지원사
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 800, color: GREEN, mt: 0.5 }}>
-                215명
+                222명
               </Typography>
             </Box>
           </motion.div>
@@ -398,7 +398,7 @@ export default function OrganizationChart() {
                 이용자
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 800, color: GREEN, mt: 0.5 }}>
-                248명
+                246명
               </Typography>
             </Box>
           </motion.div>
