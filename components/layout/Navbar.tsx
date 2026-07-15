@@ -33,7 +33,7 @@ const mainMenu = [
   {
     label: "기관소개",
     children: [
-      { label: "회사 소개", path: "/about" },
+      { label: "기관 소개", path: "/about" },
       { label: "연혁", path: "/history" },
       { label: "조직도 및 인력현황", path: "/organization" },
       { label: "시설/설비현황", path: "/facilities" },
@@ -46,8 +46,6 @@ const mainMenu = [
       { label: "복지사업", path: "/business/welfare" },
       { label: "급여 종류 및 내용 안내", path: "/business/salary-types" },
       { label: "활동지원사 직무 교육", path: "/business/job-training" },
-
-     
     ],
   },
   {
@@ -63,9 +61,15 @@ const mainMenu = [
     children: [
       { label: "성희롱 예방", path: "/notice/sexual-harassment" },
       { label: "직장내 괴롭힘", path: "/notice/workplace-bullying" },
-      { label: "안전 및 보건 관리 교육", path: "/notice/safety-health-training" },
+      {
+        label: "안전 및 보건 관리 교육",
+        path: "/notice/safety-health-training",
+      },
       { label: "재난 대응 교육", path: "/notice/disaster-response-training" },
-      { label: "직장 내 장애인 인식개선", path: "/notice/workplace-disability-awareness" },
+      {
+        label: "직장 내 장애인 인식개선",
+        path: "/notice/workplace-disability-awareness",
+      },
       { label: "활동지원사 의무 교육", path: "/business/mandatory-training" },
     ],
   },
@@ -86,8 +90,7 @@ function getActiveMainMenuIndex(pathname: string): number | null {
 
   mainMenu.forEach((menu, menuIndex) => {
     for (const c of menu.children) {
-      const matches =
-        pathname === c.path || pathname.startsWith(`${c.path}/`);
+      const matches = pathname === c.path || pathname.startsWith(`${c.path}/`);
       if (!matches) continue;
       if (c.path.length > bestLen) {
         bestLen = c.path.length;
@@ -189,14 +192,17 @@ export default function Navbar() {
                 onClick={(e) => handleOpen(e, index)}
                 sx={{
                   color: "black",
-                  fontWeight:
-                    activeMainMenuIndex === index ? "bold" : "normal",
+                  fontWeight: activeMainMenuIndex === index ? "bold" : "normal",
                   textDecoration:
                     activeMainMenuIndex === index ? "underline" : "none",
                 }}
-                aria-controls={anchorEl && openIndex === index ? "nav-menu" : undefined}
+                aria-controls={
+                  anchorEl && openIndex === index ? "nav-menu" : undefined
+                }
                 aria-haspopup="true"
-                aria-expanded={anchorEl && openIndex === index ? "true" : undefined}
+                aria-expanded={
+                  anchorEl && openIndex === index ? "true" : undefined
+                }
               >
                 {menu.label}
               </Button>
@@ -322,7 +328,11 @@ export default function Navbar() {
         <Box role="presentation" sx={{ py: 2, px: 1 }}>
           {ready && isAdmin ? (
             <Stack spacing={1.5} sx={{ px: 1, mb: 2 }}>
-              <Chip label="관리자로 로그인됨" color="secondary" sx={{ alignSelf: "flex-start" }} />
+              <Chip
+                label="관리자로 로그인됨"
+                color="secondary"
+                sx={{ alignSelf: "flex-start" }}
+              />
               <Button fullWidth variant="outlined" onClick={handleLogout}>
                 로그아웃
               </Button>
@@ -364,11 +374,7 @@ export default function Navbar() {
                         activeMainMenuIndex === index ? "bold" : "normal",
                     }}
                   />
-                  {sidebarExpanded === index ? (
-                    <ExpandLess />
-                  ) : (
-                    <ExpandMore />
-                  )}
+                  {sidebarExpanded === index ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
                 <Collapse in={sidebarExpanded === index} timeout="auto">
                   <List component="div" disablePadding sx={{ pl: 2 }}>
