@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prod": "node scripts/with-env.mjs .env.prod next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

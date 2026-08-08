@@ -1,9 +1,10 @@
 /**
  * Supabase는 프로젝트당 하나의 URL/키 쌍입니다.
- * 로컬(.env.local)과 배포(Vercel 환경 변수)에 동일한 값을 넣으면 같은 DB를 바라봅니다.
+ * Vercel과 동일한 3개 환경 변수를 사용합니다.
  *
- * URL: NEXT_PUBLIC_SUPABASE_URL 우선, 없으면 SUPABASE_URL(서버 전용 보조 — 동일 프로젝트여야 함)
- * 키: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY 또는 NEXT_PUBLIC_SUPABASE_ANON_KEY
+ * - NEXT_PUBLIC_SUPABASE_URL
+ * - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+ * - SUPABASE_SERVICE_ROLE_KEY (서버 전용, service.ts)
  */
 
 export function getSupabaseProjectUrl(): string | undefined {

@@ -1,20 +1,132 @@
 import Image from "next/image";
-import { Box, Typography, Stack, Paper, Divider } from "@mui/material";
+import Link from "next/link";
+import {
+  Box,
+  Typography,
+  Stack,
+  Paper,
+  Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import { PageSection } from "@/components/ui";
+import type { Donation } from "@/types/donation";
 
 const ACCENT = "#1B5E20";
 
 interface DonationSectionProps {
   variant: "info" | "records";
+  donations?: Donation[];
 }
 
-export default function DonationSection({ variant }: DonationSectionProps) {
+function formatDonationType(type: string): string {
+  if (type === "cash") return "현금";
+  if (type === "goods") return "물품";
+  return type;
+}
+
+function formatDate(value: string): string {
+  if (!value) return "-";
+  try {
+    return new Date(value).toLocaleDateString("ko-KR");
+  } catch {
+    return value;
+  }
+}
+
+export default function DonationSection({
+  variant,
+  donations = [],
+}: DonationSectionProps) {
   if (variant === "records") {
     return (
       <PageSection>
-        <Typography variant="body1" paragraph>
-          후원/기부금 실적 내용을 여기에 작성하세요.
-        </Typography>
+        {donations.length === 0 ? (
+          <Typography variant="body1" color="text.secondary">
+            등록된 후원/기부금 실적이 없습니다.
+          </Typography>
+        ) : (
+          <TableContainer component={Paper} elevation={0}>
+            <Table aria-label="후원 내역 테이블">
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 700 }}>제목</TableCell>
+                  <TableCell sx={{ fontWeight: 700, width: 160 }}>
+                    후원자명
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 700, width: 160 }}>
+                    후원 타입
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 700, width: 180 }}>
+                    후원 날짜
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {donations.map((donation) => (
+                    <TableRow key={donation.id} hover>
+                      <TableCell>
+                        <Link
+                          href={`/donation/records/${donation.id}`}
+                          style={{
+                            color: "inherit",
+                            textDecoration: "none",
+                            display: "block",
+                            width: "100%",
+                          }}
+                        >
+                          {donation.donation_title}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          href={`/donation/records/${donation.id}`}
+                          style={{
+                            color: "inherit",
+                            textDecoration: "none",
+                            display: "block",
+                            width: "100%",
+                          }}
+                        >
+                          {donation.donor_name || "-"}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          href={`/donation/records/${donation.id}`}
+                          style={{
+                            color: "inherit",
+                            textDecoration: "none",
+                            display: "block",
+                            width: "100%",
+                          }}
+                        >
+                          {formatDonationType(donation.donation_type)}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          href={`/donation/records/${donation.id}`}
+                          style={{
+                            color: "inherit",
+                            textDecoration: "none",
+                            display: "block",
+                            width: "100%",
+                          }}
+                        >
+                          {formatDate(donation.donation_date)}
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </PageSection>
     );
   }
