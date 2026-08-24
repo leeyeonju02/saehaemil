@@ -132,11 +132,20 @@ const HISTORY: HistoryYear[] = [
     year: "2026",
     items: [
       { month: "05월", event: "장애인과 함께 바비큐 파티 행사 사업" },
-      { month: "07월", event: "활동지원사 및 장애인 삼계탕 나눔 사업" },
+      {
+        month: "07월",
+        event: "활동지원사 및 장애인 삼계탕, 부채, 미숫가루 나눔 사업",
+      },
       {
         month: "07월",
         event:
           "이용자 및 보호자·활동지원사 부정 수급 교육, 여름철 폭염 대비 및 대응교육",
+      },
+      { month: "08월", event: "대표자 '신용' 변경" },
+      {
+        month: "08월",
+        event:
+          "새해밀 전담인력 및 소속인력 워크샵 웨스턴 라이프 호텔 진행",
       },
     ],
   },
@@ -242,10 +251,14 @@ export default function HistorySection() {
                     {/* 연도 + 연도 타이틀 */}
                     <div
                       className={`flex items-start md:pt-0 ${
-                        alignLeft ? "md:justify-end md:pr-10" : "md:justify-start md:pl-10"
+                        alignLeft
+                          ? "md:justify-end md:pr-10"
+                          : "md:justify-start md:pl-10"
                       }`}
                     >
-                      <div className={`relative max-w-md ${alignLeft ? "md:text-right" : "md:text-left"}`}>
+                      <div
+                        className={`relative max-w-md ${alignLeft ? "md:text-right" : "md:text-left"}`}
+                      >
                         <span
                           aria-hidden
                           className="pointer-events-none absolute -top-6 select-none text-7xl font-black leading-none opacity-[0.07] md:-top-8 md:text-8xl"

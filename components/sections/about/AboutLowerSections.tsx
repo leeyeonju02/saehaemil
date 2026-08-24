@@ -119,7 +119,9 @@ function MissionVisionCard({
       >
         {titleKo}
       </Typography>
-      <Typography sx={{ color: BODY_GRAY, lineHeight: 1.85, fontSize: "0.95rem" }}>
+      <Typography
+        sx={{ color: BODY_GRAY, lineHeight: 1.85, fontSize: "0.95rem" }}
+      >
         {body}
       </Typography>
       <Box
@@ -176,10 +178,14 @@ function ValueMiniCard({
       >
         {icon}
       </Box>
-      <Typography sx={{ fontWeight: 800, color: "#111", mb: 1.5, fontSize: "1.05rem" }}>
+      <Typography
+        sx={{ fontWeight: 800, color: "#111", mb: 1.5, fontSize: "1.05rem" }}
+      >
         {title}
       </Typography>
-      <Typography sx={{ color: BODY_GRAY, fontSize: "0.88rem", lineHeight: 1.75 }}>
+      <Typography
+        sx={{ color: BODY_GRAY, fontSize: "0.88rem", lineHeight: 1.75 }}
+      >
         {description}
       </Typography>
     </Box>
@@ -190,7 +196,10 @@ export default function AboutLowerSections() {
   return (
     <>
       {/* 우리의 가치 */}
-      <Box component="section" sx={{ bgcolor: SECTION_BEIGE, py: { xs: 6, md: 10 } }}>
+      <Box
+        component="section"
+        sx={{ bgcolor: SECTION_BEIGE, py: { xs: 6, md: 10 } }}
+      >
         <Container maxWidth="lg">
           <SectionHeading eyebrow="OUR VALUES" title="우리의 가치" />
 
@@ -217,7 +226,11 @@ export default function AboutLowerSections() {
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "repeat(4, 1fr)" },
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "1fr 1fr",
+                md: "repeat(4, 1fr)",
+              },
               gap: 2.5,
             }}
           >
@@ -250,7 +263,10 @@ export default function AboutLowerSections() {
       </Box>
 
       {/* 기관 현황 — 섹션 전체 배경색 */}
-      <Box component="section" sx={{ bgcolor: SECTION_ORG_BG, py: { xs: 6, md: 10 } }}>
+      <Box
+        component="section"
+        sx={{ bgcolor: SECTION_ORG_BG, py: { xs: 6, md: 10 } }}
+      >
         <Container maxWidth="lg">
           <SectionHeading eyebrow="ORGANIZATION INFO" title="기관 현황" />
 
@@ -278,7 +294,7 @@ export default function AboutLowerSections() {
               {
                 icon: <PersonIcon sx={{ fontSize: 22 }} />,
                 label: "대표자",
-                value: "박상만",
+                value: "신용",
               },
               {
                 icon: <PlaceIcon sx={{ fontSize: 22 }} />,
@@ -335,7 +351,9 @@ export default function AboutLowerSections() {
                   >
                     {row.label}
                   </Typography>
-                  <Typography sx={{ fontWeight: 700, color: "#111", fontSize: "0.95rem" }}>
+                  <Typography
+                    sx={{ fontWeight: 700, color: "#111", fontSize: "0.95rem" }}
+                  >
                     {row.value}
                   </Typography>
                 </Box>
@@ -368,7 +386,9 @@ export default function AboutLowerSections() {
                 text: "법정의무교육과 직무교육을 포함하여 연 8회 이상의 교육을 진행하며, 활동 지원사의 전문성을 지속적으로 강화합니다.",
               },
               {
-                icon: <ManageAccountsIcon sx={{ fontSize: 26, color: GREEN }} />,
+                icon: (
+                  <ManageAccountsIcon sx={{ fontSize: 26, color: GREEN }} />
+                ),
                 title: "전문적인 인력 관리",
                 text: "활동지원사의 교육, 배치, 서비스 관리까지 체계적으로 운영하여 안정적인 서비스를 제공합니다.",
               },
@@ -378,7 +398,9 @@ export default function AboutLowerSections() {
                 text: "가사서비스 제공기관 인증을 통해 검증된 서비스 품질을 유지하고 있습니다.",
               },
               {
-                icon: <AccessibilityNewIcon sx={{ fontSize: 26, color: GREEN }} />,
+                icon: (
+                  <AccessibilityNewIcon sx={{ fontSize: 26, color: GREEN }} />
+                ),
                 title: "이용자 중심 서비스",
                 text: "개인별 상황에 맞춘 맞춤형 지원을 통해 삶의 질 향상을 목표로 합니다.",
               },
@@ -412,10 +434,23 @@ export default function AboutLowerSections() {
                   {item.icon}
                 </Box>
                 <Box>
-                  <Typography sx={{ fontWeight: 800, color: "#111", mb: 1, fontSize: "1rem" }}>
+                  <Typography
+                    sx={{
+                      fontWeight: 800,
+                      color: "#111",
+                      mb: 1,
+                      fontSize: "1rem",
+                    }}
+                  >
                     {item.title}
                   </Typography>
-                  <Typography sx={{ color: BODY_GRAY, fontSize: "0.9rem", lineHeight: 1.75 }}>
+                  <Typography
+                    sx={{
+                      color: BODY_GRAY,
+                      fontSize: "0.9rem",
+                      lineHeight: 1.75,
+                    }}
+                  >
                     {item.text}
                   </Typography>
                 </Box>

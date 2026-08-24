@@ -52,11 +52,14 @@ export default function OrganizationChart() {
               textAlign: "center",
             }}
           >
-            <Typography variant="caption" sx={{ opacity: 0.85, display: "block" }}>
+            <Typography
+              variant="caption"
+              sx={{ opacity: 0.85, display: "block" }}
+            >
               대표이사
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: 800 }}>
-              박상만
+              신용
             </Typography>
           </Box>
           <Box
@@ -183,7 +186,10 @@ export default function OrganizationChart() {
                 textAlign: "center",
               }}
             >
-              <Typography variant="caption" sx={{ opacity: 0.85, display: "block" }}>
+              <Typography
+                variant="caption"
+                sx={{ opacity: 0.85, display: "block" }}
+              >
                 센터장
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 800 }}>
@@ -224,11 +230,13 @@ export default function OrganizationChart() {
                   columnGap: 2,
                 }}
               >
-                {["최병래", "구경서", "허권", "최은숙", "박상만", "김미나"].map((name) => (
-                  <Typography key={name} variant="body2" fontWeight={600}>
-                    {name}
-                  </Typography>
-                ))}
+                {["최병래", "구경서", "허권", "최은숙", "박상만", "김미나"].map(
+                  (name) => (
+                    <Typography key={name} variant="body2" fontWeight={600}>
+                      {name}
+                    </Typography>
+                  ),
+                )}
               </Box>
             </Box>
           </motion.div>
@@ -274,7 +282,11 @@ export default function OrganizationChart() {
                 borderRadius: 2,
               }}
             >
-              <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: "block" }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mb: 1, display: "block" }}
+              >
                 전담인력
               </Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -283,11 +295,16 @@ export default function OrganizationChart() {
                   { role: "과장", name: "박규남" },
                   { role: "팀장", name: "이지영" },
                   { role: "대리", name: "심찬미" },
-                  { role: "전담인력", name: "이성미" }
+                  { role: "전담인력", name: "이성미" },
                 ].map((row) => (
                   <Box
                     key={row.role}
-                    sx={{ bgcolor: "background.paper", px: 2, py: 1, borderRadius: 1 }}
+                    sx={{
+                      bgcolor: "background.paper",
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                    }}
                   >
                     <Typography variant="caption" color="text.secondary">
                       {row.role}
@@ -368,7 +385,10 @@ export default function OrganizationChart() {
               <Typography variant="body2" color="text.secondary">
                 장애인활동지원사
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 800, color: GREEN, mt: 0.5 }}>
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 800, color: GREEN, mt: 0.5 }}
+              >
                 222명
               </Typography>
             </Box>
@@ -397,7 +417,10 @@ export default function OrganizationChart() {
               <Typography variant="body2" color="text.secondary">
                 이용자
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 800, color: GREEN, mt: 0.5 }}>
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 800, color: GREEN, mt: 0.5 }}
+              >
                 246명
               </Typography>
             </Box>

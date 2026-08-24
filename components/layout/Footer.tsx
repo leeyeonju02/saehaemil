@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  Box,
-  Container,
-  Typography,
-  Link as MuiLink,
-} from "@mui/material";
+import { Box, Container, Typography, Link as MuiLink } from "@mui/material";
 import Link from "next/link";
 
 export default function Footer() {
@@ -70,22 +65,34 @@ export default function Footer() {
           >
             사단법인 새해밀 장애인 활동지원기관
           </Typography>
-          <Typography sx={{ mt: 0.5, fontSize: { xs: "0.95rem", md: "1.02rem" } }}>
+          <Typography
+            sx={{ mt: 0.5, fontSize: { xs: "0.95rem", md: "1.02rem" } }}
+          >
             주소: 전북특별자치도 익산시 무왕로29길 9-8(팔봉동)
           </Typography>
-          <Typography sx={{ mt: 0.5, fontSize: { xs: "0.95rem", md: "1.02rem" } }}>
-            대표: 박상만
+          <Typography
+            sx={{ mt: 0.5, fontSize: { xs: "0.95rem", md: "1.02rem" } }}
+          >
+            대표: 신용
           </Typography>
-          <Typography sx={{ mt: 0.5, fontSize: { xs: "0.95rem", md: "1.02rem" } }}>
-            사업자등록번호: 221-86-00921
+          <Typography
+            sx={{ mt: 0.5, fontSize: { xs: "0.95rem", md: "1.02rem" } }}
+          >
+            사업자등록번호: 390-82-00710
           </Typography>
-          <Typography sx={{ mt: 0.5, fontSize: { xs: "0.95rem", md: "1.02rem" } }}>
+          <Typography
+            sx={{ mt: 0.5, fontSize: { xs: "0.95rem", md: "1.02rem" } }}
+          >
             전화: 063-833-8582, 010-8191-9558
           </Typography>
-          <Typography sx={{ mt: 0.5, fontSize: { xs: "0.95rem", md: "1.02rem" } }}>
+          <Typography
+            sx={{ mt: 0.5, fontSize: { xs: "0.95rem", md: "1.02rem" } }}
+          >
             팩스: 063-833-7280
           </Typography>
-          <Typography sx={{ mt: 0.5, fontSize: { xs: "0.95rem", md: "1.02rem" } }}>
+          <Typography
+            sx={{ mt: 0.5, fontSize: { xs: "0.95rem", md: "1.02rem" } }}
+          >
             E-mail: newsun124@naver.com
           </Typography>
 
@@ -97,7 +104,8 @@ export default function Footer() {
               letterSpacing: "0.01em",
             }}
           >
-            COPYRIGHT ⓒ {currentYear} 사단법인 새해밀 장애인 활동지원기관. ALL RIGHTS RESERVED.
+            COPYRIGHT ⓒ {currentYear} 사단법인 새해밀 장애인 활동지원기관. ALL
+            RIGHTS RESERVED.
           </Typography>
         </Box>
       </Container>
