@@ -1,4 +1,3 @@
-import { PageHeader } from "@/components/ui";
 import LocationHeroBanner from "@/components/sections/location/LocationHeroBanner";
 import LocationSection from "@/components/sections/location/LocationSection";
 

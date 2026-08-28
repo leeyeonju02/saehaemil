@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import {
   Box,
+  Card,
   Chip,
   Container,
   Paper,
@@ -17,12 +19,13 @@ import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
 import type { SvgIconComponent } from "@mui/icons-material";
-import SalaryWorkflowDiagram from "@/components/sections/business/SalaryWorkflowDiagram";
 
 const GREEN = "#1B5E20";
 const GREEN_LIGHT = "rgba(27, 94, 32, 0.12)";
 const HEADER_BG = `linear-gradient(135deg, ${GREEN} 0%, #2E7D32 100%)`;
 const STRIPE_BG = "rgba(27, 94, 32, 0.04)";
+const SALARY_WORKFLOW_CHART_SRC =
+  "/images/business/salary-workflow-flowchart.png";
 
 const ACTIVITY_SUPPORT_TIERS = [
   { tier: "1구간", score: "465점 이상", limit: "8,293,000원" },
@@ -275,7 +278,7 @@ export default function SalaryTypesSection() {
       rowSpan: rowIndex === 0 ? group.rows.length : undefined,
       detail: row.detail,
       content: row.content,
-    }))
+    })),
   );
 
   return (
@@ -283,11 +286,18 @@ export default function SalaryTypesSection() {
       component="section"
       sx={{
         py: { xs: 5, md: 8 },
-        background: "linear-gradient(180deg, #F5F9F5 0%, #FAFAFA 40%, #FFFFFF 100%)",
+        background:
+          "linear-gradient(180deg, #F5F9F5 0%, #FAFAFA 40%, #FFFFFF 100%)",
       }}
     >
       <Container maxWidth="lg" sx={{ px: { xs: 2, md: 3 } }}>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: { xs: 6, md: 10 } }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: { xs: 6, md: 10 },
+          }}
+        >
           {/* 1. 활동지원급여 구간 */}
           <SectionBlock tint="white">
             <SectionHeading
@@ -391,10 +401,16 @@ export default function SalaryTypesSection() {
               <Table sx={{ minWidth: 640 }}>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ ...tableHeadCellSx(), width: { md: "18%" } }} align="center">
+                    <TableCell
+                      sx={{ ...tableHeadCellSx(), width: { md: "18%" } }}
+                      align="center"
+                    >
                       급여종류
                     </TableCell>
-                    <TableCell sx={{ ...tableHeadCellSx(), width: { md: "32%" } }} align="center">
+                    <TableCell
+                      sx={{ ...tableHeadCellSx(), width: { md: "32%" } }}
+                      align="center"
+                    >
                       급여내용
                     </TableCell>
                     <TableCell sx={tableHeadCellSx()} align="center">
@@ -422,25 +438,34 @@ export default function SalaryTypesSection() {
                       활동보조
                     </TableCell>
                     <TableCell sx={tableBodyCellSx()}>
-                      수급자의 가정 등을 방문하여 신체활동, 가사활동, 이동보조 등을 지원
+                      수급자의 가정 등을 방문하여 신체활동, 가사활동, 이동보조
+                      등을 지원
                     </TableCell>
                     <TableCell sx={tableBodyCellSx()}>
                       <Box component="ul" sx={{ m: 0, pl: 2.25 }}>
                         <Typography
                           component="li"
                           variant="body2"
-                          sx={{ mb: 1.25, lineHeight: 1.7, fontSize: { xs: "0.875rem", md: "0.9375rem" } }}
+                          sx={{
+                            mb: 1.25,
+                            lineHeight: 1.7,
+                            fontSize: { xs: "0.875rem", md: "0.9375rem" },
+                          }}
                         >
                           활동지원사교육기관에서 교육과정을 수료한 사람
                         </Typography>
                         <Typography
                           component="li"
                           variant="body2"
-                          sx={{ lineHeight: 1.7, fontSize: { xs: "0.875rem", md: "0.9375rem" } }}
+                          sx={{
+                            lineHeight: 1.7,
+                            fontSize: { xs: "0.875rem", md: "0.9375rem" },
+                          }}
                         >
-                          「노인복지법」에 따른 요양보호사, 「사회복지사업법」에 따른 사회복지사,
-                          「의료법」에 따른 간호사·간호조무사 및 유사 경력자* 중 이론 및
-                          실기(32시간), 현장실습(10시간)을 이수한 사람
+                          「노인복지법」에 따른 요양보호사, 「사회복지사업법」에
+                          따른 사회복지사, 「의료법」에 따른 간호사·간호조무사
+                          및 유사 경력자* 중 이론 및 실기(32시간),
+                          현장실습(10시간)을 이수한 사람
                         </Typography>
                       </Box>
                     </TableCell>
@@ -459,7 +484,39 @@ export default function SalaryTypesSection() {
             >
               업무처리 흐름도
             </SectionHeading>
-            <SalaryWorkflowDiagram />
+            <Card
+              elevation={0}
+              sx={{
+                border: 1,
+                borderColor: "rgba(27, 94, 32, 0.12)",
+                borderRadius: 2,
+                overflow: "hidden",
+                boxShadow: "0 2px 12px rgba(27, 94, 32, 0.06)",
+                maxWidth: 960,
+                mx: "auto",
+                bgcolor: "#fff",
+              }}
+            >
+              <Box sx={{ p: { xs: 0, sm: 0.5, md: 1 } }}>
+                <Box
+                  sx={{
+                    position: "relative",
+                    width: "100%",
+                    borderRadius: 1.5,
+                    overflow: "hidden",
+                  }}
+                >
+                  <Image
+                    src={SALARY_WORKFLOW_CHART_SRC}
+                    alt="업무처리 흐름도. 보건복지부에서 시·도, 시·군·구로 국고보조금 교부. 보건복지부와 사회보장정보원 간 바우처 업무위탁·예탁금·국고교부내역 통보 및 현황 보고. 시·군·구와 사회보장정보원 간 사업비 배정·급여 제공 비용 정산. 사회보장정보원과 활동지원기관 간 급여 제공 비용 청구 및 지급."
+                    width={960}
+                    height={640}
+                    sizes="(max-width: 960px) 100vw, 960px"
+                    style={{ width: "100%", height: "auto", display: "block" }}
+                  />
+                </Box>
+              </Box>
+            </Card>
           </SectionBlock>
 
           {/* 급여의 내용 */}
@@ -471,7 +528,11 @@ export default function SalaryTypesSection() {
             >
               급여의 내용
             </SectionHeading>
-            <TableContainer component={Paper} elevation={0} sx={{ ...tableCardSx(), overflow: "auto" }}>
+            <TableContainer
+              component={Paper}
+              elevation={0}
+              sx={{ ...tableCardSx(), overflow: "auto" }}
+            >
               <Table sx={{ minWidth: 720 }}>
                 <TableHead>
                   <TableRow>
@@ -522,11 +583,17 @@ export default function SalaryTypesSection() {
                       )}
                       <TableCell
                         align="center"
-                        sx={{ ...tableBodyCellSx(), fontWeight: 600, whiteSpace: "pre-line" }}
+                        sx={{
+                          ...tableBodyCellSx(),
+                          fontWeight: 600,
+                          whiteSpace: "pre-line",
+                        }}
                       >
                         {row.detail}
                       </TableCell>
-                      <TableCell sx={tableBodyCellSx()}>{row.content}</TableCell>
+                      <TableCell sx={tableBodyCellSx()}>
+                        {row.content}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -545,10 +612,14 @@ export default function SalaryTypesSection() {
               <Typography
                 variant="body2"
                 color="text.secondary"
-                sx={{ lineHeight: 1.8, fontSize: { xs: "0.8125rem", md: "0.875rem" } }}
+                sx={{
+                  lineHeight: 1.8,
+                  fontSize: { xs: "0.8125rem", md: "0.875rem" },
+                }}
               >
-                ※ 가사활동지원: 수급자 외의 가족의 가사활동지원은 포함하지 않음(단, 수급자 또는
-                수급자의 배우자가 출산 후 6개월 이내에 한하여 예외적으로 인정)
+                ※ 가사활동지원: 수급자 외의 가족의 가사활동지원은 포함하지
+                않음(단, 수급자 또는 수급자의 배우자가 출산 후 6개월 이내에
+                한하여 예외적으로 인정)
               </Typography>
             </Box>
           </SectionBlock>

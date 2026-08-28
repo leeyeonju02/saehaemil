@@ -7,6 +7,7 @@ import { theme } from "./theme";
 import { Navbar, Footer } from "@/components/layout";
 import { AuthProvider } from "@/components/providers";
 import ThemeRegistry from "@/src/theme/ThemeRegistry";
+import { SITE_URL } from "@/lib/site-config";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,6 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "새해밀 장애인 활동 지원 센터",
   description: "장애인의 일상에 함께하는 활동지원",
 };

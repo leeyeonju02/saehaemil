@@ -44,7 +44,7 @@ const mainMenu = [
     label: "사업안내",
     children: [
       { label: "복지사업", path: "/business/welfare" },
-      { label: "급여 종류 및 내용 안내", path: "/business/salary-types" },
+      { label: "급여 종류 및 내용 안내", path: "/business/salary" },
       { label: "활동지원사 직무 교육", path: "/business/job-training" },
     ],
   },
@@ -70,7 +70,7 @@ const mainMenu = [
         label: "직장 내 장애인 인식개선",
         path: "/notice/workplace-disability-awareness",
       },
-      { label: "활동지원사 의무 교육", path: "/business/mandatory-training" },
+      { label: "활동지원사 의무 교육", path: "/notice/mandatory-training" },
     ],
   },
   {
