@@ -10,6 +10,7 @@ type Props = {
 export const metadata: Metadata = {
   title: "봉사 신청 상세 | 새해밀",
   description: "봉사 신청 상세 (관리자 전용)",
+  robots: { index: false, follow: false },
 };
 
 export default async function VolunteerApplyDetailPage({ params }: Props) {

@@ -5,6 +5,7 @@ import Hero from "@/components/homepage/Hero";
 export const metadata = {
   title: "회원가입 | 새해밀",
   description: "새해밀 장애인 활동 지원 센터 회원가입",
+  robots: { index: false, follow: false },
 };
 
 export default function SignupPage() {

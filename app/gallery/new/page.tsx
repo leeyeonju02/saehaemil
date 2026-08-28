@@ -16,11 +16,13 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     return {
       title: "앨범 수정 | 새해밀",
       description: "사진 앨범 수정",
+      robots: { index: false, follow: false },
     };
   }
   return {
     title: "앨범 추가 | 새해밀",
     description: "사진 앨범 추가",
+    robots: { index: false, follow: false },
   };
 }
 

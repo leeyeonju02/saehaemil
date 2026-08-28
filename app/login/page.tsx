@@ -4,6 +4,7 @@ import LoginForm from "@/components/sections/auth/LoginForm";
 export const metadata = {
   title: "로그인 | 새해밀",
   description: "새해밀 장애인 활동 지원 센터 로그인",
+  robots: { index: false, follow: false },
 };
 
 export default function LoginPage() {
