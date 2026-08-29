@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Button,
@@ -46,6 +47,7 @@ function formatDateTime(iso: string) {
 }
 
 export default function VolunteerApplySection() {
+  const router = useRouter();
   const theme = useTheme();
   const isNarrow = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -169,7 +171,18 @@ export default function VolunteerApplySection() {
                 <TableRow
                   key={row.id}
                   hover
+                  tabIndex={0}
+                  role="link"
+                  aria-label={`${row.title} 상세 보기`}
+                  onClick={() => router.push(`/volunteer/apply/${row.id}`)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      router.push(`/volunteer/apply/${row.id}`);
+                    }
+                  }}
                   sx={{
+                    cursor: "pointer",
                     "&:last-child td": { borderBottom: 0 },
                     "&:hover": { bgcolor: "action.hover" },
                   }}
