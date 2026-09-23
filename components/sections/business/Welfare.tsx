@@ -34,7 +34,7 @@ const ACCENT_GRAD_START = "#2E7D32";
 const ACCENT_GRAD_END = "#43A047";
 const FEATURE_CARD_BG = "#F0EBE6";
 const SECTION_BG = "rgba(0, 0, 0, 0.03)";
-const CERT_IMAGE_SRC = "/images/common/가사서비스인증서.png";
+const CERT_IMAGE_SRC = "/images/common/가사서비스인증서_신용.png";
 
 const INTRO_FEATURES = [
   {
