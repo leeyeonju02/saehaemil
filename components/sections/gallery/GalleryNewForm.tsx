@@ -12,6 +12,10 @@ import {
   Alert,
   IconButton,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -47,6 +51,7 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [draftRestored, setDraftRestored] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -104,6 +109,10 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
   useEffect(() => {
     if (initialAlbum) return;
     if (!draftRestored || submitting || suppressDraftSaveRef.current) return;
+    if (!title && !content && !activityDate && files.length === 0) {
+      clearGalleryNewFormDraft();
+      return;
+    }
     const id = window.setTimeout(() => {
       void (async () => {
         try {
@@ -129,6 +138,24 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
     }, DRAFT_SAVE_MS);
     return () => window.clearTimeout(id);
   }, [initialAlbum, draftRestored, submitting, title, content, activityDate, files]);
+
+  const handleReset = () => {
+    if (initialAlbum) {
+      setTitle(initialAlbum.title);
+      setContent(initialAlbum.content);
+      setActivityDate(initialAlbum.activityDate.slice(0, 10));
+      setPersistedImageUrls(initialAlbum.images.map((i) => i.src));
+    } else {
+      setTitle("");
+      setContent("");
+      setActivityDate("");
+      clearGalleryNewFormDraft();
+    }
+    setFiles([]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setResetOpen(false);
+    setSnackbar({ open: true, message: "내용이 초기화되었습니다.", severity: "info" });
+  };
 
   const handlePickImages = () => fileInputRef.current?.click();
 
@@ -443,6 +470,16 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
         </Box>
 
         <Stack direction="row" spacing={1.5} justifyContent="flex-end">
+          <Button
+            type="button"
+            color="error"
+            variant="outlined"
+            disabled={submitting}
+            onClick={() => setResetOpen(true)}
+            sx={{ mr: "auto" }}
+          >
+            내용 초기화
+          </Button>
           <Button type="button" variant="outlined" disabled={submitting} onClick={() => router.back()}>
             취소
           </Button>
@@ -475,6 +512,23 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      <Dialog open={resetOpen} onClose={() => setResetOpen(false)} fullWidth maxWidth="xs">
+        <DialogTitle>내용 초기화</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary">
+            {initialAlbum
+              ? "수정한 내용을 모두 되돌리고 원래 앨범 내용으로 초기화합니다. 계속하시겠습니까?"
+              : "작성 중인 내용과 임시 저장을 모두 삭제합니다. 되돌릴 수 없습니다. 계속하시겠습니까?"}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setResetOpen(false)}>취소</Button>
+          <Button color="error" variant="contained" onClick={handleReset}>
+            초기화
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
