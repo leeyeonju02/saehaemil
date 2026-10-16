@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { Notice, NoticeAttachment } from "@/types/notice";
 import { DEFAULT_NOTICE_AUTHOR, NOTICES_TABLE } from "@/lib/notices-constants";
 
@@ -33,7 +34,7 @@ function toIsoString(value: unknown): string {
   return String(value);
 }
 
-function mapRow(row: Record<string, unknown>): Notice {
+export function mapRow(row: Record<string, unknown>): Notice {
   const imageRaw = row.image_urls;
   let image_urls: string[] = [];
   if (Array.isArray(imageRaw)) {
@@ -50,7 +51,7 @@ function mapRow(row: Record<string, unknown>): Notice {
   }
 
   const fileUrlsRaw = row.file_urls ?? row.attachments;
-  let attachments = parseAttachmentArray(fileUrlsRaw);
+  const attachments = parseAttachmentArray(fileUrlsRaw);
 
   return {
     id: String(row.id ?? ""),
@@ -70,7 +71,7 @@ function mapRow(row: Record<string, unknown>): Notice {
   };
 }
 
-function sortForList(a: Notice, b: Notice): number {
+export function sortForList(a: Notice, b: Notice): number {
   if (a.is_pinned !== b.is_pinned) return a.is_pinned ? -1 : 1;
   if (b.sort_order !== a.sort_order) return b.sort_order - a.sort_order;
   return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
@@ -103,4 +104,26 @@ export async function fetchNoticeByIdFromSupabase(
 export async function fetchAllNoticeIdsFromSupabase(): Promise<string[]> {
   const list = await fetchNoticesFromSupabase();
   return list.map((n) => n.id);
+}
+
+/** 관리자용 — 비공개(is_visible=false) 포함 전체 목록. service role 사용, 서버 전용 */
+export async function fetchAllNoticesForAdmin(): Promise<Notice[]> {
+  const supabase = createSupabaseServiceClient();
+  const { data, error } = await supabase.from(NOTICES_TABLE).select("*");
+  if (error) throw error;
+  const rows = (data ?? []) as Record<string, unknown>[];
+  return rows.map(mapRow).sort(sortForList);
+}
+
+/** 관리자용 — 비공개 포함 단건. service role 사용, 서버 전용 */
+export async function fetchNoticeByIdForAdmin(id: string): Promise<Notice | undefined> {
+  const supabase = createSupabaseServiceClient();
+  const { data, error } = await supabase
+    .from(NOTICES_TABLE)
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return undefined;
+  return mapRow(data as Record<string, unknown>);
 }

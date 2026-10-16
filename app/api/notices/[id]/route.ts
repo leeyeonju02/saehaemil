@@ -10,6 +10,8 @@ type Body = {
   title?: string;
   content?: string;
   is_pinned?: boolean;
+  /** false 면 비공개 (관리자만 조회) */
+  is_visible?: boolean;
   image_urls?: string[];
   file_urls?: FileUrlItem[];
   adminPassword?: string;
@@ -84,6 +86,9 @@ export async function PATCH(
     is_pinned,
     updated_at: now,
   };
+  if (typeof body.is_visible === "boolean") {
+    patch.is_visible = body.is_visible;
+  }
   if (image_urls !== undefined) {
     patch.image_urls = image_urls;
   }
@@ -141,11 +146,8 @@ export async function DELETE(
     return NextResponse.json({ error: message }, { status: 500 });
   }
 
-  const now = new Date().toISOString();
-  const { error } = await supabase
-    .from(NOTICES_TABLE)
-    .update({ is_visible: false, updated_at: now })
-    .eq("id", idNum);
+  // is_visible=false 는 비공개 용도로 쓰므로 삭제는 행을 실제로 지운다
+  const { error } = await supabase.from(NOTICES_TABLE).delete().eq("id", idNum);
 
   if (error) {
     console.error("[api/notices DELETE]", error);

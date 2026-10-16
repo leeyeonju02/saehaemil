@@ -1,13 +1,9 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { PageHeader, PageSection } from "@/components/ui";
-import { Typography, Box, Button, Stack } from "@mui/material";
-import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import { loadNoticeById, loadAllNoticeIds } from "@/lib/notices";
-import { encodePublicPath } from "@/lib/public-file-url";
-import Link from "next/link";
-import Hero from "@/components/homepage/Hero";
-import NoticeDetailAdminBar from "@/components/sections/notice/NoticeDetailAdminBar";
+import { fetchNoticeByIdForAdmin } from "@/lib/notices-supabase";
+import NoticeDetailView from "@/components/sections/notice/NoticeDetailView";
+import NoticePrivateDetail from "@/components/sections/notice/NoticePrivateDetail";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -20,11 +16,21 @@ export async function generateStaticParams() {
   return ids.map((id) => ({ id }));
 }
 
+/** 공개 목록에 없는 공지가 비공개로 존재하는지 (내용은 넘기지 않음) */
+async function isPrivateNotice(id: string): Promise<boolean> {
+  try {
+    const notice = await fetchNoticeByIdForAdmin(id);
+    return Boolean(notice && !notice.is_visible);
+  } catch {
+    return false;
+  }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const notice = await loadNoticeById(id);
   if (!notice) {
-    return { title: "공지사항 | 새해밀" };
+    return { title: "공지사항 | 새해밀", robots: { index: false, follow: false } };
   }
   return {
     title: `${notice.title} | 새해밀`,
@@ -36,118 +42,14 @@ export default async function NoticeDetailPage({ params }: Props) {
   const { id } = await params;
   const notice = await loadNoticeById(id);
 
-  if (!notice) {
-    notFound();
+  if (notice) {
+    return <NoticeDetailView notice={notice} />;
   }
 
-  const dateLabel = new Date(notice.created_at).toLocaleString("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
+  // 비공개 공지는 서버 HTML에 내용을 싣지 않고, 관리자 브라우저에서 따로 불러온다
+  if (await isPrivateNotice(id)) {
+    return <NoticePrivateDetail noticeId={id} />;
+  }
 
-  return (
-    <>
-      <Hero />
-      <PageHeader
-        title={notice.title}
-        description={`작성자: ${notice.author} · 등록: ${dateLabel}`}
-      />
-      <PageSection>
-        <NoticeDetailAdminBar noticeId={notice.id} />
-        <Box
-          sx={{
-            bgcolor: "#FFFFFF",
-            borderRadius: 2,
-            border: 1,
-            borderColor: "divider",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-            p: { xs: 2.5, sm: 3, md: 4 },
-            minHeight: { xs: "max(22rem, 48vh)", md: "max(24rem, 40vh)" },
-          }}
-        >
-          {notice.image_urls.length > 0 && (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-                mb: 3,
-              }}
-            >
-              {notice.image_urls.map((url) => (
-                <Box
-                  key={url}
-                  component="img"
-                  src={url}
-                  alt=""
-                  sx={{
-                    maxWidth: "100%",
-                    height: "auto",
-                    borderRadius: 1,
-                  }}
-                />
-              ))}
-            </Box>
-          )}
-          {notice.attachments.length > 0 && (
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
-                첨부파일
-              </Typography>
-              <Stack spacing={1} alignItems="stretch">
-                {notice.attachments.map((att) => (
-                  <Button
-                    key={`${att.url}-${att.label}`}
-                    component="a"
-                    href={encodePublicPath(att.url)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    variant="outlined"
-                    size="medium"
-                    startIcon={<InsertDriveFileOutlinedIcon />}
-                    sx={{
-                      justifyContent: "flex-start",
-                      textAlign: "left",
-                      py: 1.25,
-                      borderColor: "divider",
-                      color: "text.primary",
-                    }}
-                  >
-                    {att.label}
-                  </Button>
-                ))}
-              </Stack>
-            </Box>
-          )}
-          <Box
-            component="article"
-            sx={{
-              whiteSpace: "pre-wrap",
-              lineHeight: 1.8,
-              "& p": { mb: 2 },
-            }}
-          >
-            <Typography variant="body1" component="div" color="text.primary">
-              {notice.content}
-            </Typography>
-          </Box>
-        </Box>
-        <Typography sx={{ mt: { xs: 10, md: 15 } }}>
-          <Link
-            href="/notice"
-            style={{
-              color: "inherit",
-              textDecoration: "underline",
-            }}
-          >
-            ← 공지사항 목록으로
-          </Link>
-        </Typography>
-      </PageSection>
-    </>
-  );
+  notFound();
 }

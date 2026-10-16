@@ -1,0 +1,129 @@
+import { Typography, Box, Button, Stack, Chip } from "@mui/material";
+import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
+import Link from "next/link";
+import { PageHeader, PageSection } from "@/components/ui";
+import Hero from "@/components/homepage/Hero";
+import NoticeDetailAdminBar from "@/components/sections/notice/NoticeDetailAdminBar";
+import { encodePublicPath } from "@/lib/public-file-url";
+import type { Notice } from "@/types/notice";
+
+type Props = {
+  notice: Notice;
+};
+
+/** 공지 상세 화면 — 공개 상세(서버)와 비공개 상세(관리자, 클라이언트) 공용 */
+export default function NoticeDetailView({ notice }: Props) {
+  const dateLabel = new Date(notice.created_at).toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  return (
+    <>
+      <Hero />
+      <PageHeader
+        title={notice.title}
+        description={`작성자: ${notice.author} · 등록: ${dateLabel}`}
+      />
+      <PageSection>
+        <NoticeDetailAdminBar noticeId={notice.id} />
+        {!notice.is_visible && (
+          <Chip label="비공개 · 관리자만 볼 수 있습니다" color="warning" size="small" sx={{ mb: 2 }} />
+        )}
+        <Box
+          sx={{
+            bgcolor: "#FFFFFF",
+            borderRadius: 2,
+            border: 1,
+            borderColor: "divider",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+            p: { xs: 2.5, sm: 3, md: 4 },
+            minHeight: { xs: "max(22rem, 48vh)", md: "max(24rem, 40vh)" },
+          }}
+        >
+          {notice.image_urls.length > 0 && (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                mb: 3,
+              }}
+            >
+              {notice.image_urls.map((url) => (
+                <Box
+                  key={url}
+                  component="img"
+                  src={url}
+                  alt=""
+                  sx={{
+                    maxWidth: "100%",
+                    height: "auto",
+                    borderRadius: 1,
+                  }}
+                />
+              ))}
+            </Box>
+          )}
+          {notice.attachments.length > 0 && (
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
+                첨부파일
+              </Typography>
+              <Stack spacing={1} alignItems="stretch">
+                {notice.attachments.map((att) => (
+                  <Button
+                    key={`${att.url}-${att.label}`}
+                    component="a"
+                    href={encodePublicPath(att.url)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="outlined"
+                    size="medium"
+                    startIcon={<InsertDriveFileOutlinedIcon />}
+                    sx={{
+                      justifyContent: "flex-start",
+                      textAlign: "left",
+                      py: 1.25,
+                      borderColor: "divider",
+                      color: "text.primary",
+                    }}
+                  >
+                    {att.label}
+                  </Button>
+                ))}
+              </Stack>
+            </Box>
+          )}
+          <Box
+            component="article"
+            sx={{
+              whiteSpace: "pre-wrap",
+              lineHeight: 1.8,
+              "& p": { mb: 2 },
+            }}
+          >
+            <Typography variant="body1" component="div" color="text.primary">
+              {notice.content}
+            </Typography>
+          </Box>
+        </Box>
+        <Typography sx={{ mt: { xs: 10, md: 15 } }}>
+          <Link
+            href="/notice"
+            style={{
+              color: "inherit",
+              textDecoration: "underline",
+            }}
+          >
+            ← 공지사항 목록으로
+          </Link>
+        </Typography>
+      </PageSection>
+    </>
+  );
+}

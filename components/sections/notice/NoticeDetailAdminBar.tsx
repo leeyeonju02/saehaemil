@@ -104,7 +104,7 @@ export default function NoticeDetailAdminBar({ noticeId }: Props) {
         <DialogTitle>공지 삭제</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary">
-            이 공지를 목록에서 숨깁니다. 계속하시겠습니까?
+            이 공지를 데이터베이스에서 삭제합니다. 되돌릴 수 없습니다. 계속하시겠습니까?
           </Typography>
           {errorText ? (
             <Typography variant="body2" color="error" sx={{ mt: 2 }}>

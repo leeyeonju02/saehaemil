@@ -40,6 +40,7 @@ export default function NoticeNewForm({ initialNotice }: Props) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPinned, setIsPinned] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(false);
   const [persistedImageUrls, setPersistedImageUrls] = useState<string[]>([]);
   const [persistedAttachments, setPersistedAttachments] = useState<NoticeAttachment[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -59,6 +60,7 @@ export default function NoticeNewForm({ initialNotice }: Props) {
       setTitle(initialNotice.title);
       setContent(initialNotice.content);
       setIsPinned(initialNotice.is_pinned);
+      setIsPrivate(!initialNotice.is_visible);
       setPersistedImageUrls([...initialNotice.image_urls]);
       setPersistedAttachments([...initialNotice.attachments]);
       setEditingId(initialNotice.id);
@@ -66,6 +68,7 @@ export default function NoticeNewForm({ initialNotice }: Props) {
       setTitle("");
       setContent("");
       setIsPinned(false);
+      setIsPrivate(false);
       setPersistedImageUrls([]);
       setPersistedAttachments([]);
       setEditingId(null);
@@ -192,6 +195,7 @@ export default function NoticeNewForm({ initialNotice }: Props) {
           title: title.trim(),
           content: content.trim(),
           is_pinned: isPinned,
+          is_visible: !isPrivate,
           image_urls,
           file_urls,
           adminPassword,
@@ -489,6 +493,17 @@ export default function NoticeNewForm({ initialNotice }: Props) {
             />
           }
           label="상단 고정 (목록 최상단에 고정 표시)"
+        />
+
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={isPrivate}
+              onChange={(e) => setIsPrivate(e.target.checked)}
+              name="is_private"
+            />
+          }
+          label="비공개 (관리자만 볼 수 있음)"
         />
 
         <Box

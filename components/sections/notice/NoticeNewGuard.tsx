@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Box, Typography, Button, CircularProgress } from "@mui/material";
 import Link from "next/link";
 import { useAuth } from "@/components/providers";
 import NoticeNewForm from "@/components/sections/notice/NoticeNewForm";
+import { fetchNoticeAsAdmin } from "@/lib/notices-admin-client";
 import type { Notice } from "@/types/notice";
 
 type Props = {
@@ -15,8 +17,27 @@ type Props = {
 
 export default function NoticeNewGuard({ initialNotice, editRequestedId }: Props) {
   const { isAdmin, ready } = useAuth();
+  /** 비공개 공지는 서버에서 불러오지 않으므로 관리자 권한으로 다시 조회 */
+  const [privateNotice, setPrivateNotice] = useState<Notice | null>(null);
+  const [privateLookupDone, setPrivateLookupDone] = useState(false);
+  const needsPrivateLookup = Boolean(editRequestedId && !initialNotice);
 
-  if (!ready) {
+  useEffect(() => {
+    if (!ready || !isAdmin || !needsPrivateLookup || !editRequestedId) return;
+    let cancelled = false;
+    fetchNoticeAsAdmin(editRequestedId).then((result) => {
+      if (cancelled) return;
+      setPrivateNotice(result);
+      setPrivateLookupDone(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [ready, isAdmin, needsPrivateLookup, editRequestedId]);
+
+  const notice = initialNotice ?? privateNotice ?? undefined;
+
+  if (!ready || (isAdmin && needsPrivateLookup && !privateLookupDone)) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
         <CircularProgress size={32} />
@@ -37,7 +58,7 @@ export default function NoticeNewGuard({ initialNotice, editRequestedId }: Props
     );
   }
 
-  if (editRequestedId && !initialNotice) {
+  if (editRequestedId && !notice) {
     return (
       <Box sx={{ textAlign: "center", py: 4 }}>
         <Typography variant="body1" color="text.secondary" gutterBottom>
@@ -50,5 +71,5 @@ export default function NoticeNewGuard({ initialNotice, editRequestedId }: Props
     );
   }
 
-  return <NoticeNewForm initialNotice={initialNotice ?? null} />;
+  return <NoticeNewForm initialNotice={notice ?? null} />;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Table,
   TableBody,
@@ -16,6 +16,7 @@ import {
   TextField,
   InputAdornment,
   Button,
+  Chip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
@@ -23,6 +24,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Notice } from "@/types/notice";
 import { useAuth } from "@/components/providers";
+import { fetchNoticesAsAdmin } from "@/lib/notices-admin-client";
 
 interface NoticeListProps {
   initialNotices: Notice[];
@@ -56,7 +58,24 @@ export default function NoticeList({ initialNotices }: NoticeListProps) {
   const { isAdmin, ready } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const allNotices = useMemo(() => initialNotices, [initialNotices]);
+  /** 관리자일 때만 비공개 포함 목록으로 교체 */
+  const [adminNotices, setAdminNotices] = useState<Notice[] | null>(null);
+
+  useEffect(() => {
+    if (!ready || !isAdmin) return;
+    let cancelled = false;
+    fetchNoticesAsAdmin().then((list) => {
+      if (!cancelled && list) setAdminNotices(list);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [ready, isAdmin]);
+
+  const allNotices = useMemo(
+    () => (isAdmin && adminNotices ? adminNotices : initialNotices),
+    [isAdmin, adminNotices, initialNotices]
+  );
   const notices = useMemo(
     () => filterNotices(allNotices, searchQuery),
     [allNotices, searchQuery]
@@ -196,6 +215,9 @@ export default function NoticeList({ initialNotices }: NoticeListProps) {
                     {orderDisplay}
                   </TableCell>
                   <TableCell>
+                    {!notice.is_visible && (
+                      <Chip label="비공개" color="warning" size="small" sx={{ mr: 1 }} />
+                    )}
                     <Typography component="span" sx={{ fontWeight: 500 }}>
                       {notice.title}
                     </Typography>

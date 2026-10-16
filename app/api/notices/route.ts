@@ -10,6 +10,8 @@ type Body = {
   title?: string;
   content?: string;
   is_pinned?: boolean;
+  /** false 면 비공개 (관리자만 조회) */
+  is_visible?: boolean;
   image_urls?: string[];
   file_urls?: FileUrlItem[];
   adminPassword?: string;
@@ -26,6 +28,7 @@ export async function POST(request: Request) {
   const title = typeof body.title === "string" ? body.title.trim() : "";
   const content = typeof body.content === "string" ? body.content.trim() : "";
   const is_pinned = Boolean(body.is_pinned);
+  const is_visible = body.is_visible !== false;
   const image_urls = Array.isArray(body.image_urls)
     ? body.image_urls.filter((u): u is string => typeof u === "string" && u.length > 0)
     : [];
@@ -69,7 +72,7 @@ export async function POST(request: Request) {
     content,
     image_urls,
     file_urls,
-    is_visible: true,
+    is_visible,
     is_pinned,
     sort_order: 0,
     created_at: now,
