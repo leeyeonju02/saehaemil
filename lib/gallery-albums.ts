@@ -13,6 +13,8 @@ export type GalleryAlbum = {
   /** 활동·봉사 일자 (YYYY-MM-DD 또는 ISO) */
   activityDate: string;
   images: GalleryImageItem[];
+  /** 대표사진 URL (DB `pin`). 없으면 첫 번째 사진 */
+  coverSrc?: string | null;
 };
 
 export const GALLERY_ALBUMS: GalleryAlbum[] = [
@@ -91,5 +93,8 @@ export function getAllAlbumIds(): string[] {
 
 /** 대표 이미지 — 첫 장 */
 export function getAlbumCover(album: GalleryAlbum): GalleryImageItem {
-  return album.images[0] ?? { src: "/images/history/his1.png", alt: album.title };
+  const pinned = album.coverSrc
+    ? album.images.find((image) => image.src === album.coverSrc)
+    : undefined;
+  return pinned ?? album.images[0] ?? { src: "/images/history/his1.png", alt: album.title };
 }

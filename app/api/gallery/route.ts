@@ -9,6 +9,8 @@ type Body = {
   content?: string;
   activity_date?: string;
   images?: string[];
+  /** 대표사진 URL — images 중 하나, 선택하지 않으면 null */
+  pin?: string | null;
   adminPassword?: string;
 };
 
@@ -27,6 +29,7 @@ export async function POST(request: Request) {
   const images = Array.isArray(body.images)
     ? body.images.filter((u): u is string => typeof u === "string" && u.length > 0)
     : [];
+  const pin = typeof body.pin === "string" && images.includes(body.pin) ? body.pin : null;
 
   if (!title || !content) {
     return NextResponse.json(
@@ -74,6 +77,7 @@ export async function POST(request: Request) {
     content,
     activity_date,
     images,
+    pin,
     created_at: now,
     updated_at: now,
   };

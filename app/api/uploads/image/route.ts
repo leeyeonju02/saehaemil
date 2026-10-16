@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { uploadPublicImage } from "@/lib/storage/upload-public-image";
 import { verifyImageUploadAuth } from "@/lib/storage/verify-upload-auth";
 import { buildUuidStorageObjectPath } from "@/lib/storage/storage-object-path";
-import { validateImageBlob } from "@/lib/storage/validate-image-blob";
+import { getImageError } from "@/lib/upload/image/validate";
 
 export const runtime = "nodejs";
 
@@ -56,11 +56,11 @@ export async function POST(request: Request) {
   }
 
   const blob = fileEntry as Blob;
-  const validated = validateImageBlob(blob);
-  if (!validated.ok) {
-    return NextResponse.json({ error: validated.error }, { status: 400 });
+  const invalid = getImageError(blob);
+  if (invalid) {
+    return NextResponse.json({ error: invalid }, { status: 400 });
   }
-  const mime = validated.mime;
+  const mime = blob.type;
 
   const purposeRaw = formData.get("purpose");
   const folder = typeof purposeRaw === "string" ? purposeRaw : "general";

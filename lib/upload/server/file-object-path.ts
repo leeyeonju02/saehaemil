@@ -1,19 +1,14 @@
 import { randomUUID } from "crypto";
 import { sanitizeFolderSegment } from "@/lib/storage/sanitize-upload-path";
-import { ALLOWED_NOTICE_FILE_EXTENSIONS } from "@/lib/storage/notice-file-upload-config";
-
-const NOTICE_FILES_FOLDER = "notice/files";
+import { ALLOWED_FILE_EXTENSIONS } from "@/lib/upload/file/config";
+import { getFileExtension } from "@/lib/upload/file/validate";
 
 /**
- * 공지 문서 첨부용 확장자 — 파일명 우선, 없으면 MIME 보조.
+ * 첨부 문서용 확장자 — 파일명 우선, 없으면 MIME 보조.
  */
-export function getSafeNoticeDocumentExtension(
-  originalFilename: string,
-  contentType: string
-): string {
-  const name = originalFilename.trim();
-  const part = name.split(".").pop()?.toLowerCase() ?? "";
-  if (ALLOWED_NOTICE_FILE_EXTENSIONS.has(part)) {
+export function getSafeFileExtension(originalFilename: string, contentType: string): string {
+  const part = getFileExtension(originalFilename);
+  if (ALLOWED_FILE_EXTENSIONS.has(part)) {
     return part;
   }
 
@@ -45,15 +40,15 @@ export function getSafeNoticeDocumentExtension(
 }
 
 /**
- * 공지 문서 Storage 객체 경로 `{folder}/{uuid}.{ext}` (원본 파일명은 경로에 포함하지 않음)
+ * 첨부 문서 Storage 객체 경로 `{folder}/{uuid}.{ext}` (원본 파일명은 경로에 포함하지 않음)
  */
-export function buildUuidNoticeDocumentObjectPath(
+export function buildUuidFileObjectPath(
+  baseSegment: string,
   originalFilename: string,
   contentType: string
 ): string {
-  const folder = sanitizeFolderSegment(NOTICE_FILES_FOLDER);
-  const ext = getSafeNoticeDocumentExtension(originalFilename, contentType);
-  const safeExt = ALLOWED_NOTICE_FILE_EXTENSIONS.has(ext) ? ext : "bin";
+  const folder = sanitizeFolderSegment(baseSegment);
+  const ext = getSafeFileExtension(originalFilename, contentType);
   const id = randomUUID();
-  return `${folder}/${id}.${safeExt}`;
+  return `${folder}/${id}.${ext}`;
 }

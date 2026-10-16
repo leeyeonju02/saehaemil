@@ -19,9 +19,12 @@ import {
 } from "@mui/material";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { ADMIN_PW_SESSION_KEY } from "@/lib/auth-storage";
-import { MAX_IMAGE_BYTES } from "@/lib/storage/image-upload-config";
-import { uploadGalleryImagesToSupabase } from "@/lib/gallery/upload-images-to-supabase";
+import { IMAGE_INPUT_ACCEPT, MAX_ORIGINAL_IMAGE_BYTES } from "@/lib/upload/image/config";
+import { prepareImageSelection } from "@/lib/upload/image/compress";
+import { uploadImages } from "@/lib/upload/image/upload-images";
 import type { GalleryAlbum } from "@/lib/gallery-albums";
 import {
   clearGalleryNewFormDraft,
@@ -32,6 +35,19 @@ import {
 } from "@/lib/gallery-new-draft-storage";
 
 const DRAFT_SAVE_MS = 500;
+
+/** 대표사진 선택 — 기존 사진은 URL, 새로 추가한 사진은 업로드 전이라 순번으로 가리킨다 */
+type CoverSelection =
+  | { kind: "persisted"; url: string }
+  | { kind: "new"; index: number }
+  | null;
+
+function getInitialCover(album: GalleryAlbum): CoverSelection {
+  const url = album.coverSrc;
+  return url && album.images.some((image) => image.src === url)
+    ? { kind: "persisted", url }
+    : null;
+}
 
 type Props = {
   /** `?edit=id` 로 열었을 때 서버에서 전달된 DB 앨범 (없으면 신규) */
@@ -46,11 +62,13 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
   const [content, setContent] = useState("");
   const [activityDate, setActivityDate] = useState("");
   const [persistedImageUrls, setPersistedImageUrls] = useState<string[]>([]);
+  const [cover, setCover] = useState<CoverSelection>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [draftRestored, setDraftRestored] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [preparingImages, setPreparingImages] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -66,6 +84,7 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
       setContent(initialAlbum.content);
       setActivityDate(initialAlbum.activityDate.slice(0, 10));
       setPersistedImageUrls(initialAlbum.images.map((i) => i.src));
+      setCover(getInitialCover(initialAlbum));
       setEditingId(initialAlbum.id);
       setFiles([]);
       setDraftRestored(true);
@@ -73,6 +92,7 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
     }
     setEditingId(null);
     setPersistedImageUrls([]);
+    setCover(null);
     let cancelled = false;
     (async () => {
       const d = loadGalleryNewFormDraft();
@@ -137,7 +157,15 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
       })();
     }, DRAFT_SAVE_MS);
     return () => window.clearTimeout(id);
-  }, [initialAlbum, draftRestored, submitting, title, content, activityDate, files]);
+  }, [
+    initialAlbum,
+    draftRestored,
+    submitting,
+    title,
+    content,
+    activityDate,
+    files,
+  ]);
 
   const handleReset = () => {
     if (initialAlbum) {
@@ -145,6 +173,7 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
       setContent(initialAlbum.content);
       setActivityDate(initialAlbum.activityDate.slice(0, 10));
       setPersistedImageUrls(initialAlbum.images.map((i) => i.src));
+      setCover(getInitialCover(initialAlbum));
     } else {
       setTitle("");
       setContent("");
@@ -152,54 +181,127 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
       clearGalleryNewFormDraft();
     }
     setFiles([]);
+    if (initialAlbum == null) setCover(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
     setResetOpen(false);
-    setSnackbar({ open: true, message: "내용이 초기화되었습니다.", severity: "info" });
+    setSnackbar({
+      open: true,
+      message: "내용이 초기화되었습니다.",
+      severity: "info",
+    });
   };
 
   const handlePickImages = () => fileInputRef.current?.click();
 
-  const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = Array.from(e.target.files ?? []).filter((f) =>
-      f.type.startsWith("image/")
-    );
-    if (selected.length === 0) return;
-    const oversized = selected.find((f) => f.size > MAX_IMAGE_BYTES);
-    if (oversized) {
-      setSnackbar({
-        open: true,
-        message: `파일당 최대 ${MAX_IMAGE_BYTES / 1024 / 1024}MB까지 업로드할 수 있습니다. (${oversized.name})`,
-        severity: "error",
-      });
-      e.target.value = "";
-      return;
-    }
-    setFiles((prev) => [...prev, ...selected]);
+  // 이미지 용량 제한
+  const handleFilesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const picked = Array.from(e.target.files ?? []);
     e.target.value = "";
+    if (picked.length === 0) return;
+    setPreparingImages(true);
+    const { files: selected, error } = await prepareImageSelection(picked);
+    setPreparingImages(false);
+    if (error) {
+      setSnackbar({ open: true, message: error, severity: "error" });
+    }
+    if (selected.length > 0) {
+      setFiles((prev) => [...prev, ...selected]);
+    }
   };
 
   const removeImageAt = (index: number) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
+    setCover((prev) => {
+      if (prev?.kind !== "new") return prev;
+      if (prev.index === index) return null;
+      return prev.index > index ? { kind: "new", index: prev.index - 1 } : prev;
+    });
   };
 
   const removePersistedImageAt = (index: number) => {
+    const url = persistedImageUrls[index];
     setPersistedImageUrls((prev) => prev.filter((_, i) => i !== index));
+    setCover((prev) => (prev?.kind === "persisted" && prev.url === url ? null : prev));
   };
+
+  const isPersistedCover = (url: string) => cover?.kind === "persisted" && cover.url === url;
+  const isNewCover = (index: number) => cover?.kind === "new" && cover.index === index;
+
+  const togglePersistedCover = (url: string) => {
+    setCover(isPersistedCover(url) ? null : { kind: "persisted", url });
+  };
+
+  const toggleNewCover = (index: number) => {
+    setCover(isNewCover(index) ? null : { kind: "new", index });
+  };
+
+  const renderCoverToggle = (selected: boolean, onClick: () => void) => (
+    <>
+      <IconButton
+        type="button"
+        size="small"
+        aria-label={selected ? "대표사진 선택 해제" : "대표사진으로 선택"}
+        aria-pressed={selected}
+        onClick={onClick}
+        disabled={submitting}
+        sx={{
+          position: "absolute",
+          top: 4,
+          left: 4,
+          bgcolor: "rgba(0,0,0,0.5)",
+          color: selected ? "warning.light" : "common.white",
+          "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+        }}
+      >
+        {selected ? <StarIcon fontSize="small" /> : <StarBorderIcon fontSize="small" />}
+      </IconButton>
+      {selected && (
+        <Typography
+          variant="caption"
+          sx={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            py: 0.25,
+            textAlign: "center",
+            bgcolor: "primary.main",
+            color: "primary.contrastText",
+            fontWeight: 600,
+          }}
+        >
+          대표사진
+        </Typography>
+      )}
+    </>
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const t = title.trim();
     const c = content.trim();
     if (!t) {
-      setSnackbar({ open: true, message: "제목을 입력해 주세요.", severity: "info" });
+      setSnackbar({
+        open: true,
+        message: "제목을 입력해 주세요.",
+        severity: "info",
+      });
       return;
     }
     if (!c) {
-      setSnackbar({ open: true, message: "내용을 입력해 주세요.", severity: "info" });
+      setSnackbar({
+        open: true,
+        message: "내용을 입력해 주세요.",
+        severity: "info",
+      });
       return;
     }
     if (!activityDate) {
-      setSnackbar({ open: true, message: "활동 날짜를 선택해 주세요.", severity: "info" });
+      setSnackbar({
+        open: true,
+        message: "활동 날짜를 선택해 주세요.",
+        severity: "info",
+      });
       return;
     }
     const isEdit = Boolean(editingId);
@@ -241,13 +343,17 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
     try {
       const isEdit = Boolean(editingId);
       let imageUrls: string[];
+      let newUrls: string[] = [];
       if (files.length > 0) {
         console.log(
           "[gallery-flow] 1 시작 — 이미지 업로드(발급→Storage 직접 업로드)",
           { fileCount: files.length }
         );
-        const fromStorage = await uploadGalleryImagesToSupabase(files, adminPassword);
-        const newUrls = fromStorage.map((row) => row.url);
+        const fromStorage = await uploadImages(files, {
+          purpose: "gallery",
+          adminPassword,
+        });
+        newUrls = fromStorage.map((row) => row.url);
         console.log("[gallery-flow] 1 완료 — 공개 URL 확보", {
           urlCount: newUrls.length,
           urls: newUrls,
@@ -257,18 +363,30 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
         imageUrls = [...persistedImageUrls];
       }
 
-      const saveRes = await fetch(isEdit ? `/api/gallery/${editingId}` : "/api/gallery", {
-        method: isEdit ? "PATCH" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: t,
-          content: c,
-          activity_date: activityDate,
-          images: imageUrls,
-          adminPassword,
-        }),
-      });
-      const saveJson = (await saveRes.json()) as { error?: string; id?: string };
+      const saveRes = await fetch(
+        isEdit ? `/api/gallery/${editingId}` : "/api/gallery",
+        {
+          method: isEdit ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: t,
+            content: c,
+            activity_date: activityDate,
+            images: imageUrls,
+            pin:
+              cover?.kind === "persisted"
+                ? cover.url
+                : cover?.kind === "new"
+                  ? (newUrls[cover.index] ?? null)
+                  : null,
+            adminPassword,
+          }),
+        }
+      );
+      const saveJson = (await saveRes.json()) as {
+        error?: string;
+        id?: string;
+      };
 
       const resultId = saveJson.id ?? (isEdit ? editingId : undefined);
       if (!saveRes.ok || !resultId) {
@@ -315,7 +433,8 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
       }}
     >
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        작성 중인 내용은 이 브라우저에 임시 저장됩니다. 앨범 저장에 성공하면 임시 저장이 삭제됩니다.
+        작성 중인 내용은 이 브라우저에 임시 저장됩니다. 앨범 저장에 성공하면
+        임시 저장이 삭제됩니다.
       </Typography>
       <Stack spacing={2.5}>
         <TextField
@@ -356,7 +475,7 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/gif,image/webp"
+            accept={IMAGE_INPUT_ACCEPT}
             multiple
             hidden
             onChange={handleFilesChange}
@@ -364,19 +483,35 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
           <Button
             type="button"
             variant="outlined"
-            startIcon={<ImageOutlinedIcon />}
+            startIcon={
+              preparingImages ? <CircularProgress size={18} color="inherit" /> : <ImageOutlinedIcon />
+            }
             onClick={handlePickImages}
-            disabled={submitting}
+            disabled={submitting || preparingImages}
             sx={{ mb: 1 }}
           >
-            이미지 선택
+            {preparingImages ? "이미지 줄이는 중…" : "이미지 선택"}
           </Button>
-          <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
-            여러 장 선택 가능 · 파일당 최대 {MAX_IMAGE_BYTES / 1024 / 1024}MB (JPEG, PNG, GIF,
-            WEBP)
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            display="block"
+            sx={{ mb: 1 }}
+          >
+            여러 장 선택 가능 · 파일당 최대 {MAX_ORIGINAL_IMAGE_BYTES / 1024 / 1024}MB
+            (JPEG, PNG, GIF, WEBP) · 큰 사진은 자동으로 줄여서 올립니다
+            <br />
+            사진의 ☆ 버튼을 눌러 대표사진을 선택할 수 있습니다. 선택하지 않으면 첫 번째 사진이
+            대표사진이 됩니다.
           </Typography>
           {persistedImageUrls.length > 0 && (
-            <Stack direction="row" flexWrap="wrap" gap={2} useFlexGap sx={{ mb: 2 }}>
+            <Stack
+              direction="row"
+              flexWrap="wrap"
+              gap={2}
+              useFlexGap
+              sx={{ mb: 2 }}
+            >
               {persistedImageUrls.map((url, index) => (
                 <Box
                   key={`${url}-${index}`}
@@ -386,8 +521,8 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
                     height: 120,
                     borderRadius: 1,
                     overflow: "hidden",
-                    border: 1,
-                    borderColor: "divider",
+                    border: isPersistedCover(url) ? 2 : 1,
+                    borderColor: isPersistedCover(url) ? "primary.main" : "divider",
                   }}
                 >
                   <Box
@@ -417,12 +552,19 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
                   >
                     <DeleteOutlineIcon fontSize="small" />
                   </IconButton>
+                  {renderCoverToggle(isPersistedCover(url), () => togglePersistedCover(url))}
                 </Box>
               ))}
             </Stack>
           )}
           {previewUrls.length > 0 && (
-            <Stack direction="row" flexWrap="wrap" gap={2} useFlexGap sx={{ mt: 1 }}>
+            <Stack
+              direction="row"
+              flexWrap="wrap"
+              gap={2}
+              useFlexGap
+              sx={{ mt: 1 }}
+            >
               {previewUrls.map((url, index) => (
                 <Box
                   key={`${url}-${index}`}
@@ -432,8 +574,8 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
                     height: 120,
                     borderRadius: 1,
                     overflow: "hidden",
-                    border: 1,
-                    borderColor: "divider",
+                    border: isNewCover(index) ? 2 : 1,
+                    borderColor: isNewCover(index) ? "primary.main" : "divider",
                   }}
                 >
                   <Box
@@ -463,6 +605,7 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
                   >
                     <DeleteOutlineIcon fontSize="small" />
                   </IconButton>
+                  {renderCoverToggle(isNewCover(index), () => toggleNewCover(index))}
                 </Box>
               ))}
             </Stack>
@@ -480,20 +623,25 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
           >
             내용 초기화
           </Button>
-          <Button type="button" variant="outlined" disabled={submitting} onClick={() => router.back()}>
+          <Button
+            type="button"
+            variant="outlined"
+            disabled={submitting}
+            onClick={() => router.back()}
+          >
             취소
           </Button>
           <Button
             type="submit"
             variant="contained"
-            disabled={submitting}
-            startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : undefined}
+            disabled={submitting || preparingImages}
+            startIcon={
+              submitting ? (
+                <CircularProgress size={18} color="inherit" />
+              ) : undefined
+            }
           >
-            {submitting
-              ? "업로드 중…"
-              : editingId
-                ? "변경 저장"
-                : "앨범 저장"}
+            {submitting ? "업로드 중…" : editingId ? "변경 저장" : "앨범 저장"}
           </Button>
         </Stack>
       </Stack>
@@ -513,7 +661,12 @@ export default function GalleryNewForm({ initialAlbum }: Props) {
         </Alert>
       </Snackbar>
 
-      <Dialog open={resetOpen} onClose={() => setResetOpen(false)} fullWidth maxWidth="xs">
+      <Dialog
+        open={resetOpen}
+        onClose={() => setResetOpen(false)}
+        fullWidth
+        maxWidth="xs"
+      >
         <DialogTitle>내용 초기화</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary">

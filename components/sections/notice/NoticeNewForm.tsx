@@ -21,22 +21,17 @@ import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutl
 import Link from "next/link";
 import { ADMIN_PW_SESSION_KEY } from "@/lib/auth-storage";
 import type { Notice, NoticeAttachment } from "@/types/notice";
-import { MAX_IMAGE_BYTES } from "@/lib/storage/image-upload-config";
-import {
-  ALLOWED_NOTICE_FILE_EXTENSIONS,
-  MAX_NOTICE_FILE_BYTES,
-} from "@/lib/storage/notice-file-upload-config";
-import { uploadNoticeMediaToSupabase } from "@/lib/notices/upload-notice-media-to-supabase";
+import { IMAGE_INPUT_ACCEPT, MAX_ORIGINAL_IMAGE_BYTES } from "@/lib/upload/image/config";
+import { FILE_INPUT_ACCEPT, MAX_FILE_BYTES } from "@/lib/upload/file/config";
+import { prepareImageSelection } from "@/lib/upload/image/compress";
+import { validateFileSelection } from "@/lib/upload/file/validate";
+import { uploadImages } from "@/lib/upload/image/upload-images";
+import { uploadFiles } from "@/lib/upload/file/upload-files";
 
 type Props = {
   /** 수정 모드일 때 서버에서 전달된 공지 (없으면 신규 작성) */
   initialNotice: Notice | null;
 };
-
-function isAllowedNoticeDocFile(file: File): boolean {
-  const part = file.name.trim().split(".").pop()?.toLowerCase() ?? "";
-  return ALLOWED_NOTICE_FILE_EXTENSIONS.has(part);
-}
 
 export default function NoticeNewForm({ initialNotice }: Props) {
   const router = useRouter();
@@ -52,6 +47,7 @@ export default function NoticeNewForm({ initialNotice }: Props) {
   const [docFiles, setDocFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [preparingImages, setPreparingImages] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -89,48 +85,30 @@ export default function NoticeNewForm({ initialNotice }: Props) {
   const handlePickImages = () => fileInputRef.current?.click();
   const handlePickDocs = () => docInputRef.current?.click();
 
-  const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = Array.from(e.target.files ?? []).filter((f) =>
-      f.type.startsWith("image/")
-    );
-    if (selected.length === 0) return;
-    const oversized = selected.find((f) => f.size > MAX_IMAGE_BYTES);
-    if (oversized) {
-      setSnackbar({
-        open: true,
-        message: `이미지는 ${MAX_IMAGE_BYTES / 1024 / 1024}MB 이하여야 합니다. (${oversized.name})`,
-        severity: "error",
-      });
-      e.target.value = "";
-      return;
-    }
-    setFiles((prev) => [...prev, ...selected]);
+  const handleFilesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const picked = Array.from(e.target.files ?? []);
     e.target.value = "";
+    if (picked.length === 0) return;
+    setPreparingImages(true);
+    const { files: selected, error } = await prepareImageSelection(picked);
+    setPreparingImages(false);
+    if (error) {
+      setSnackbar({ open: true, message: error, severity: "error" });
+    }
+    if (selected.length > 0) {
+      setFiles((prev) => [...prev, ...selected]);
+    }
   };
 
   const handleDocsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = Array.from(e.target.files ?? []).filter(isAllowedNoticeDocFile);
-    if (selected.length === 0) {
-      setSnackbar({
-        open: true,
-        message: "허용된 형식만 선택할 수 있습니다. (pdf, xlsx, xls, hwp, hwpx, doc, docx, ppt, pptx)",
-        severity: "info",
-      });
-      e.target.value = "";
-      return;
-    }
-    const oversized = selected.find((f) => f.size > MAX_NOTICE_FILE_BYTES);
-    if (oversized) {
-      setSnackbar({
-        open: true,
-        message: `첨부는 ${MAX_NOTICE_FILE_BYTES / 1024 / 1024}MB 이하여야 합니다. (${oversized.name})`,
-        severity: "error",
-      });
-      e.target.value = "";
-      return;
-    }
-    setDocFiles((prev) => [...prev, ...selected]);
+    const { files: selected, error } = validateFileSelection(Array.from(e.target.files ?? []));
     e.target.value = "";
+    if (error) {
+      setSnackbar({ open: true, message: error, severity: "error" });
+    }
+    if (selected.length > 0) {
+      setDocFiles((prev) => [...prev, ...selected]);
+    }
   };
 
   const removeImageAt = (index: number) => {
@@ -189,11 +167,11 @@ export default function NoticeNewForm({ initialNotice }: Props) {
       try {
         const uploadedImages =
           files.length > 0
-            ? await uploadNoticeMediaToSupabase(files, adminPassword, "image")
+            ? await uploadImages(files, { purpose: "notice", adminPassword })
             : [];
         const uploadedDocs =
           docFiles.length > 0
-            ? await uploadNoticeMediaToSupabase(docFiles, adminPassword, "file")
+            ? await uploadFiles(docFiles, { purpose: "notice", adminPassword })
             : [];
 
         image_urls = isEdit
@@ -295,7 +273,7 @@ export default function NoticeNewForm({ initialNotice }: Props) {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept={IMAGE_INPUT_ACCEPT}
             multiple
             hidden
             onChange={handleFilesChange}
@@ -303,15 +281,18 @@ export default function NoticeNewForm({ initialNotice }: Props) {
           <Button
             type="button"
             variant="outlined"
-            startIcon={<ImageOutlinedIcon />}
+            startIcon={
+              preparingImages ? <CircularProgress size={18} color="inherit" /> : <ImageOutlinedIcon />
+            }
             onClick={handlePickImages}
+            disabled={preparingImages}
             sx={{ mb: 2 }}
           >
-            이미지 선택
+            {preparingImages ? "이미지 줄이는 중…" : "이미지 선택"}
           </Button>
           <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
             여러 장 선택 가능합니다. 등록 시 Supabase Storage에 업로드됩니다 (이미지당 최대{" "}
-            {MAX_IMAGE_BYTES / 1024 / 1024}MB).
+            {MAX_ORIGINAL_IMAGE_BYTES / 1024 / 1024}MB, 큰 사진은 자동으로 줄여서 올립니다).
           </Typography>
           {persistedImageUrls.length > 0 && (
             <Stack direction="row" flexWrap="wrap" gap={2} useFlexGap sx={{ mb: 2 }}>
@@ -414,20 +395,7 @@ export default function NoticeNewForm({ initialNotice }: Props) {
           <input
             ref={docInputRef}
             type="file"
-            accept={[
-              ".pdf",
-              ".xlsx",
-              ".xls",
-              ".hwp",
-              ".hwpx",
-              ".doc",
-              ".docx",
-              ".ppt",
-              ".pptx",
-              "application/pdf",
-              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-              "application/vnd.ms-excel",
-            ].join(",")}
+            accept={FILE_INPUT_ACCEPT}
             multiple
             hidden
             onChange={handleDocsChange}
@@ -443,7 +411,7 @@ export default function NoticeNewForm({ initialNotice }: Props) {
           </Button>
           <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
             여러 파일 선택 가능합니다.             갤러리 사진과 동일하게 서명 URL로 Storage에 올린 뒤, DB file_urls 컬럼에 label·url 배열로
-            저장됩니다 (파일당 최대 {MAX_NOTICE_FILE_BYTES / 1024 / 1024}MB).
+            저장됩니다 (파일당 최대 {MAX_FILE_BYTES / 1024 / 1024}MB).
           </Typography>
           {persistedAttachments.length > 0 && (
             <Stack spacing={0.75} sx={{ mb: 2 }}>
@@ -538,7 +506,7 @@ export default function NoticeNewForm({ initialNotice }: Props) {
             type="submit"
             variant="contained"
             size="large"
-            disabled={submitting}
+            disabled={submitting || preparingImages}
             startIcon={
               submitting ? (
                 <CircularProgress size={20} color="inherit" />

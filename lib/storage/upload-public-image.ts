@@ -1,6 +1,6 @@
 import { Buffer } from "node:buffer";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
-import { DEFAULT_STORAGE_BUCKET } from "@/lib/storage/image-upload-config";
+import { IMAGE_STORAGE_BUCKET } from "@/lib/upload/server/buckets";
 
 export type UploadPublicImageResult = {
   path: string;
@@ -17,7 +17,7 @@ export async function uploadPublicImage(params: {
   contentType: string;
   bucket?: string;
 }): Promise<UploadPublicImageResult> {
-  const bucket = params.bucket ?? DEFAULT_STORAGE_BUCKET;
+  const bucket = params.bucket ?? IMAGE_STORAGE_BUCKET;
   const supabase = createSupabaseServiceClient();
 
   const body = Buffer.from(params.bytes);

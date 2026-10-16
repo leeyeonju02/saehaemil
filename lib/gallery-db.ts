@@ -11,6 +11,8 @@ type GalleryRow = {
   content: string | null;
   activity_date: string | null;
   images: string[] | null;
+  /** 대표사진 URL — 선택하지 않으면 null */
+  pin: string | null;
 };
 
 function mapRowToAlbum(row: GalleryRow): GalleryAlbum {
@@ -23,6 +25,7 @@ function mapRowToAlbum(row: GalleryRow): GalleryAlbum {
     createdAt: row.created_at,
     activityDate: row.activity_date ?? row.created_at.slice(0, 10),
     images: urls.map((src) => ({ src, alt: title || "사진" })),
+    coverSrc: row.pin ?? null,
   };
 }
 

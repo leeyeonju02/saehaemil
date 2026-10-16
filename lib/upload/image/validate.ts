@@ -1,29 +1,31 @@
 import {
   ALLOWED_IMAGE_MIME_TYPES,
   MAX_IMAGE_BYTES,
-} from "@/lib/storage/image-upload-config";
+  MAX_ORIGINAL_IMAGE_BYTES,
+} from "@/lib/upload/image/config";
 
-export type ValidatedImageBlob =
-  | { ok: true; mime: string }
-  | { ok: false; error: string };
+function getImageErrorWithLimit(
+  file: { type: string; size: number },
+  maxBytes: number
+): string | null {
+  if (file.size <= 0) {
+    return "빈 파일입니다.";
+  }
+  if (file.size > maxBytes) {
+    return `이미지는 파일당 ${maxBytes / 1024 / 1024}MB 이하여야 합니다.`;
+  }
+  if (!ALLOWED_IMAGE_MIME_TYPES.has(file.type)) {
+    return "허용되지 않는 이미지 형식입니다. (JPEG, PNG, GIF, WEBP)";
+  }
+  return null;
+}
 
-/** 공통 이미지 업로드 API용 Blob 검증 */
-export function validateImageBlob(blob: Blob): ValidatedImageBlob {
-  if (blob.size <= 0) {
-    return { ok: false, error: "빈 파일입니다." };
-  }
-  if (blob.size > MAX_IMAGE_BYTES) {
-    return {
-      ok: false,
-      error: `파일 크기는 ${MAX_IMAGE_BYTES / 1024 / 1024}MB 이하여야 합니다.`,
-    };
-  }
-  const mime = blob.type || "application/octet-stream";
-  if (!ALLOWED_IMAGE_MIME_TYPES.has(mime)) {
-    return {
-      ok: false,
-      error: "허용되지 않는 이미지 형식입니다. (JPEG, PNG, GIF, WEBP)",
-    };
-  }
-  return { ok: true, mime };
+/** 업로드할 이미지 검증 (클라이언트·서버 공용). 통과하면 null */
+export function getImageError(file: { type: string; size: number }): string | null {
+  return getImageErrorWithLimit(file, MAX_IMAGE_BYTES);
+}
+
+/** 선택한 원본 이미지 검증 — 줄이기 전이라 더 큰 한도를 쓴다. 통과하면 null */
+export function getOriginalImageError(file: { type: string; size: number }): string | null {
+  return getImageErrorWithLimit(file, MAX_ORIGINAL_IMAGE_BYTES);
 }
