@@ -76,9 +76,10 @@ const mainMenu = [
   {
     label: "소통",
     children: [
-      { label: "소통 게시판", path: "/board" },
       { label: "공지사항", path: "/notice" },
+      { label: "뉴스", path: "/news" },
       { label: "사진앨범", path: "/gallery" },
+      { label: "소통 게시판", path: "/board" },
     ],
   },
 ];

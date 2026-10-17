@@ -23,6 +23,7 @@ const STATIC_ROUTES: { path: string; changeFrequency: MetadataRoute.Sitemap[numb
   { path: "/notice/workplace-bullying", changeFrequency: "yearly", priority: 0.5 },
   { path: "/notice/workplace-disability-awareness", changeFrequency: "yearly", priority: 0.5 },
   { path: "/gallery", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/news", changeFrequency: "daily", priority: 0.6 },
   { path: "/board", changeFrequency: "daily", priority: 0.6 },
   { path: "/donation", changeFrequency: "monthly", priority: 0.6 },
   { path: "/donation/records", changeFrequency: "weekly", priority: 0.6 },
