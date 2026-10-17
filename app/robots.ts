@@ -11,6 +11,7 @@ export default function robots(): MetadataRoute.Robots {
         "/signup",
         "/gallery/new",
         "/notice/new",
+        "/news/new",
         "/donation/records/new",
         "/volunteer/apply/*",
       ],
