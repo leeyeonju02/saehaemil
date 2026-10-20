@@ -19,10 +19,11 @@ npm run prod    # .env.prod로 로컬에서 프로덕션 환경 시뮬레이션 
 npm run build   # 프로덕션 빌드
 npm run start   # 빌드된 앱 실행
 npm run lint    # ESLint (eslint.config.mjs, flat config, eslint-config-next 기반)
+npm test        # Vitest 단위 테스트 1회 실행 (npm run test:watch 로 감시 모드)
 ```
 
 - **Prettier 없음** — 포맷팅은 ESLint 규칙만 따른다.
-- **테스트 프레임워크 없음** (Jest/Vitest/Playwright 미설치). 테스트 코드를 임의로 추가하지 말 것.
+- **테스트: Vitest** (`vitest.config.mts`, Node 환경, `@/` 별칭 지원). 테스트는 `tests/` 아래에 소스 경로를 따라 `*.test.ts`로 둔다 (예: `lib/link-preview/fetch-html.ts` → `tests/lib/link-preview/fetch-html.test.ts`). 네트워크·Supabase는 `vi.mock`으로 대체하고 실제 호출하지 않는다. UI 컴포넌트 테스트 도구(jsdom, Testing Library)는 설치되어 있지 않다.
 
 ## 디렉토리 구조
 

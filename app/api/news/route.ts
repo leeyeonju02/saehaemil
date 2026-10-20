@@ -117,6 +117,7 @@ export async function POST(request: Request) {
     );
   }
 
+  revalidatePath("/");
   revalidatePath("/news");
 
   return NextResponse.json({ id: String((data as { id: unknown }).id) });

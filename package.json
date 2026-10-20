@@ -7,7 +7,9 @@
     "prod": "node scripts/with-env.mjs .env.prod next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -17,6 +19,7 @@
     "@mui/material-nextjs": "^7.3.9",
     "@supabase/supabase-js": "^2.99.3",
     "browser-image-compression": "^2.0.2",
+    "cheerio": "^1.2.0",
     "framer-motion": "^12.38.0",
     "leaflet": "^1.9.4",
     "next": "16.1.1",
@@ -33,6 +36,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.7"
   }
 }
