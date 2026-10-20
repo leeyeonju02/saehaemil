@@ -18,7 +18,10 @@ const BADGE_BG = "rgba(27, 94, 32, 0.12)";
 
 function formatDate(iso: string) {
   const d = new Date(iso);
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}.${String(d.getDate()).padStart(2, "0")}`;
 }
 
 function isNew(iso: string) {
@@ -101,7 +104,9 @@ export default function HomeFoundationNews({ notices }: { notices: Notice[] }) {
         >
           {list.length === 0 ? (
             <Box sx={{ py: 4, px: 2, textAlign: "center" }}>
-              <Typography color="text.secondary">등록된 공지가 없습니다.</Typography>
+              <Typography color="text.secondary">
+                등록된 공지가 없습니다.
+              </Typography>
             </Box>
           ) : (
             list.map((notice, index) => (
@@ -111,80 +116,73 @@ export default function HomeFoundationNews({ notices }: { notices: Notice[] }) {
                   href={`/notice/${notice.id}`}
                   style={{ textDecoration: "none", color: "inherit" }}
                 >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: { xs: 1.5, sm: 2 },
-                    py: { xs: 1.75, sm: 2 },
-                    px: { xs: 2, sm: 2.5 },
-                    flexWrap: { xs: "wrap", sm: "nowrap" },
-                    transition: "background-color 0.15s",
-                    "&:hover": {
-                      bgcolor: "action.hover",
-                    },
-                  }}
-                >
-                  <Chip
-                    label={notice.is_pinned ? "공지" : "소식"}
-                    size="small"
+                  <Box
                     sx={{
-                      bgcolor: BADGE_BG,
-                      color: ACCENT,
-                      fontWeight: 700,
-                      fontSize: "0.75rem",
-                      height: 26,
-                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: { xs: 1.5, sm: 2 },
+                      py: { xs: 1.75, sm: 2 },
+                      px: { xs: 2, sm: 2.5 },
+                      flexWrap: { xs: "wrap", sm: "nowrap" },
+                      transition: "background-color 0.15s",
+                      "&:hover": {
+                        bgcolor: "action.hover",
+                      },
                     }}
-                  />
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Stack direction="row" alignItems="center" gap={1} flexWrap="wrap">
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight={700}
-                        sx={{
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                        }}
+                  >
+                    <Chip
+                      label={notice.is_pinned ? "공지" : "소식"}
+                      size="small"
+                      sx={{
+                        bgcolor: BADGE_BG,
+                        color: ACCENT,
+                        fontWeight: 700,
+                        fontSize: "0.75rem",
+                        height: 26,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        gap={1}
+                        flexWrap="wrap"
                       >
-                        {notice.title}
-                      </Typography>
-                      {isNew(notice.created_at) && (
-                        <Chip
-                          icon={
-                            <NotificationsNone sx={{ fontSize: "16px !important", color: "#d32f2f !important" }} />
-                          }
-                          label="NEW"
-                          size="small"
+                        <Typography
+                          variant="subtitle1"
+                          fontWeight={700}
                           sx={{
-                            height: 22,
-                            fontSize: "0.7rem",
-                            fontWeight: 800,
-                            color: "#d32f2f",
-                            bgcolor: "rgba(211, 47, 47, 0.08)",
-                            border: "1px solid rgba(211, 47, 47, 0.25)",
-                            "& .MuiChip-icon": { ml: "4px" },
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
                           }}
-                        />
-                      )}
+                        >
+                          {notice.title}
+                        </Typography>
+                      </Stack>
+                    </Box>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={0.5}
+                      sx={{ flexShrink: 0, color: "text.secondary" }}
+                    >
+                      {/* <CalendarToday sx={{ fontSize: 18 }} /> */}
+                      <Typography
+                        variant="body2"
+                        component="span"
+                        sx={{ whiteSpace: "nowrap" }}
+                      >
+                        {formatDate(notice.created_at)}
+                      </Typography>
+                      <ChevronRight
+                        sx={{ fontSize: 22, color: "action.active", ml: 0.5 }}
+                      />
                     </Stack>
                   </Box>
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    spacing={0.5}
-                    sx={{ flexShrink: 0, color: "text.secondary" }}
-                  >
-                    <CalendarToday sx={{ fontSize: 18 }} />
-                    <Typography variant="body2" component="span" sx={{ whiteSpace: "nowrap" }}>
-                      {formatDate(notice.created_at)}
-                    </Typography>
-                    <ChevronRight sx={{ fontSize: 22, color: "action.active", ml: 0.5 }} />
-                  </Stack>
-                </Box>
                 </Link>
               </Box>
             ))

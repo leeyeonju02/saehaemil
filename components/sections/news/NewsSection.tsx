@@ -1,18 +1,25 @@
 import { Box, Stack, Typography } from "@mui/material";
 import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined";
-import { PageSection } from "@/components/ui";
+import { PageSection, Pagination } from "@/components/ui";
 import NewsAddButton from "@/components/sections/news/NewsAddButton";
 import NewsHero from "@/components/sections/news/NewsHero";
 import NewsMasthead from "@/components/sections/news/NewsMasthead";
 import NewsTile from "@/components/sections/news/NewsTile";
+import { paginate } from "@/lib/pagination";
 import type { News } from "@/types/news";
+
+/** 한 페이지에 보여줄 기사 카드 수 (상단 대표 기사는 제외) */
+const NEWS_PAGE_SIZE = 9;
 
 type Props = {
   news: News[];
+  /** 1부터 시작하는 현재 페이지 (범위를 벗어나면 보정됨) */
+  page?: number;
 };
 
-export default function NewsSection({ news }: Props) {
+export default function NewsSection({ news, page = 1 }: Props) {
   const [hero, ...rest] = news;
+  const { items: cards, page: currentPage, totalPages } = paginate(rest, page, NEWS_PAGE_SIZE);
 
   return (
     <PageSection>
@@ -36,9 +43,9 @@ export default function NewsSection({ news }: Props) {
           </Box>
         ) : (
           <Stack spacing={{ xs: 5, md: 6 }}>
-            <NewsHero news={hero} />
+            {currentPage === 1 && <NewsHero news={hero} />}
 
-            {rest.length > 0 && (
+            {cards.length > 0 && (
               <Box>
                 <Typography
                   component="h2"
@@ -63,12 +70,13 @@ export default function NewsSection({ news }: Props) {
                     rowGap: { xs: 4, md: 5 },
                   }}
                 >
-                  {rest.map((item) => (
+                  {cards.map((item) => (
                     <li key={item.id}>
                       <NewsTile news={item} />
                     </li>
                   ))}
                 </Box>
+                <Pagination page={currentPage} totalPages={totalPages} />
               </Box>
             )}
           </Stack>

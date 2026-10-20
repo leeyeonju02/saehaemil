@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Box, Typography, Paper } from "@mui/material";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
-import { PageSection } from "@/components/ui";
+import { PageSection, Pagination } from "@/components/ui";
 import { getAlbumCover } from "@/lib/gallery-albums";
 import type { GalleryAlbum } from "@/lib/gallery-albums";
 import { formatActivityDateLabel, formatCreatedAtLabel } from "@/lib/gallery-dates";
@@ -12,11 +12,14 @@ import { formatActivityDateLabel, formatCreatedAtLabel } from "@/lib/gallery-dat
 const ACCENT = "#1B5E20";
 
 type Props = {
-  /** Supabase `gallery` 테이블에서만 불러온 앨범 목록 */
+  /** Supabase `gallery` 테이블에서 불러온 앨범 중 현재 페이지에 해당하는 목록 */
   albums: GalleryAlbum[];
+  /** 1부터 시작하는 현재 페이지 */
+  page: number;
+  totalPages: number;
 };
 
-export default function GallerySection({ albums }: Props) {
+export default function GallerySection({ albums, page, totalPages }: Props) {
   return (
     <PageSection>
       {albums.length === 0 ? (
@@ -134,6 +137,7 @@ export default function GallerySection({ albums }: Props) {
           })}
         </Box>
       )}
+      {albums.length > 0 && <Pagination page={page} totalPages={totalPages} />}
     </PageSection>
   );
 }
