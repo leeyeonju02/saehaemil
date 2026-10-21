@@ -27,7 +27,7 @@ export default function Hero() {
     <Box
       sx={{
         position: "relative",
-        minHeight: { xs: "min(92vh, 820px)", md: "min(88vh, 760px)" },
+        minHeight: { xs: "min(80vh, 640px)", md: "min(88vh, 760px)" },
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -91,7 +91,7 @@ export default function Hero() {
             useFlexGap
             sx={{
               justifyContent: "flex-start",
-              gap: 1,
+              gap: { xs: 0.75, sm: 1 },
               width: "100%",
             }}
           >
@@ -115,7 +115,7 @@ export default function Hero() {
                   letterSpacing: "0.02em",
                   fontSize: { xs: "0.75rem", sm: "0.8125rem" },
                   "& .MuiChip-label": {
-                    px: 2,
+                    px: { xs: 1.25, sm: 2 },
                     py: 0.75,
                   },
                   "&:hover": {
@@ -132,7 +132,8 @@ export default function Hero() {
             sx={{
               fontWeight: 800,
               lineHeight: 1.25,
-              fontSize: { xs: "1.65rem", sm: "2.15rem", md: "2.65rem" },
+              fontSize: { xs: "1.5rem", sm: "2.15rem", md: "2.65rem" },
+              wordBreak: "keep-all",
               textShadow: "0 2px 24px rgba(0,0,0,0.45)",
               maxWidth: 720,
               width: "100%",
@@ -148,8 +149,8 @@ export default function Hero() {
           <Typography
             sx={{
               fontWeight: 400,
-              fontSize: { xs: "0.95rem", sm: "1.05rem", md: "1.15rem" },
-              lineHeight: 1.75,
+              fontSize: { xs: "0.9375rem", sm: "1.05rem", md: "1.15rem" },
+              lineHeight: { xs: 1.65, md: 1.75 },
               opacity: 0.98,
               maxWidth: 560,
               textAlign: "left",

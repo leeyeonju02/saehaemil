@@ -17,7 +17,8 @@ export default async function HomePage() {
   const latestNews = await loadLatestNews(5);
 
   return (
-    <Box>
+    // 한글이 글자 단위로 끊기지 않도록 어절 단위 줄바꿈 (긴 URL 등은 넘치지 않게 강제 줄바꿈)
+    <Box sx={{ wordBreak: "keep-all", overflowWrap: "break-word" }}>
       <Hero />
       <HomeWhatWeDo />
       <HomeFoundationNews notices={notices} />

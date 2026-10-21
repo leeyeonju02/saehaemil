@@ -73,7 +73,7 @@ export default function HomeWhatWeDo() {
             component="h2"
             sx={{
               fontWeight: 800,
-              fontSize: { xs: "1.75rem", sm: "2rem", md: "2.25rem" },
+              fontSize: { xs: "1.5rem", sm: "2rem", md: "2.25rem" },
               color: "text.primary",
             }}
           >
@@ -88,8 +88,10 @@ export default function HomeWhatWeDo() {
           sx={{
             maxWidth: 640,
             mx: "auto",
-            mb: { xs: 4, md: 5 },
+            mb: { xs: 3, md: 5 },
             lineHeight: 1.75,
+            fontSize: { xs: "0.9375rem", md: "1rem" },
+            wordBreak: "keep-all",
           }}
         >
           사단법인 새해밀은 장애인의 자립생활 이념 실현과 사회참여 증진을 위해
@@ -104,7 +106,7 @@ export default function HomeWhatWeDo() {
               sm: "repeat(2, minmax(0, 1fr))",
               md: "repeat(4, minmax(0, 1fr))",
             },
-            gap: 2,
+            gap: { xs: 1.5, md: 2 },
           }}
         >
           {ITEMS.map(({ href, title, description, Icon }) => (
@@ -132,28 +134,47 @@ export default function HomeWhatWeDo() {
                   },
                 }}
               >
-              <CardContent sx={{ p: 2.5, "&:last-child": { pb: 2.5 } }}>
+              <CardContent
+                sx={{
+                  p: { xs: 2, sm: 2.5 },
+                  "&:last-child": { pb: { xs: 2, sm: 2.5 } },
+                  display: "flex",
+                  flexDirection: { xs: "row", sm: "column" },
+                  alignItems: "flex-start",
+                  gap: { xs: 1.75, sm: 2 },
+                }}
+              >
                 <Box
                   sx={{
-                    width: 48,
-                    height: 48,
+                    width: { xs: 44, sm: 48 },
+                    height: { xs: 44, sm: 48 },
+                    flexShrink: 0,
                     borderRadius: 1,
                     bgcolor: ICON_BG,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    mb: 2,
                     border: `1px solid rgba(27, 94, 32, 0.2)`,
                   }}
                 >
-                  <Icon sx={{ color: ACCENT, fontSize: 26 }} />
+                  <Icon sx={{ color: ACCENT, fontSize: { xs: 24, sm: 26 } }} />
                 </Box>
-                <Typography variant="subtitle1" fontWeight={700} gutterBottom>
-                  {title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.65 }}>
-                  {description}
-                </Typography>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={700}
+                    sx={{ mb: 0.5, fontSize: { xs: "0.9375rem", sm: "1rem" }, lineHeight: 1.4 }}
+                  >
+                    {title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ lineHeight: 1.6, fontSize: { xs: "0.8125rem", sm: "0.875rem" }, wordBreak: "keep-all" }}
+                  >
+                    {description}
+                  </Typography>
+                </Box>
               </CardContent>
             </Card>
             </Link>

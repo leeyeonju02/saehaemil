@@ -44,9 +44,8 @@ export default function HomeFoundationNews({ notices }: { notices: Notice[] }) {
           direction="row"
           alignItems="flex-end"
           justifyContent="space-between"
-          flexWrap="wrap"
           gap={2}
-          sx={{ mb: 3 }}
+          sx={{ mb: { xs: 2.5, md: 3 } }}
         >
           <Box sx={{ textAlign: "left" }}>
             <Typography
@@ -80,7 +79,9 @@ export default function HomeFoundationNews({ notices }: { notices: Notice[] }) {
                 color: "text.primary",
                 bgcolor: "#ffffff",
                 borderRadius: 2,
-                px: 2,
+                px: { xs: 1.5, sm: 2 },
+                fontSize: { xs: "0.8125rem", sm: "0.875rem" },
+                whiteSpace: "nowrap",
                 fontWeight: 600,
                 "&:hover": {
                   borderColor: ACCENT,
@@ -116,14 +117,23 @@ export default function HomeFoundationNews({ notices }: { notices: Notice[] }) {
                   href={`/notice/${notice.id}`}
                   style={{ textDecoration: "none", color: "inherit" }}
                 >
+                  {/* 모바일: [뱃지 · 날짜] 아래 제목 한 줄 전체 / 데스크톱: 뱃지 · 제목 · 날짜 한 줄 */}
                   <Box
                     sx={{
-                      display: "flex",
+                      display: "grid",
+                      gridTemplateColumns: {
+                        xs: "auto 1fr auto",
+                        sm: "auto 1fr auto auto",
+                      },
+                      gridTemplateAreas: {
+                        xs: '"chip date arrow" "title title arrow"',
+                        sm: '"chip title date arrow"',
+                      },
                       alignItems: "center",
-                      gap: { xs: 1.5, sm: 2 },
+                      columnGap: { xs: 1, sm: 2 },
+                      rowGap: 0.75,
                       py: { xs: 1.75, sm: 2 },
                       px: { xs: 2, sm: 2.5 },
-                      flexWrap: { xs: "wrap", sm: "nowrap" },
                       transition: "background-color 0.15s",
                       "&:hover": {
                         bgcolor: "action.hover",
@@ -134,54 +144,52 @@ export default function HomeFoundationNews({ notices }: { notices: Notice[] }) {
                       label={notice.is_pinned ? "공지" : "소식"}
                       size="small"
                       sx={{
+                        gridArea: "chip",
                         bgcolor: BADGE_BG,
                         color: ACCENT,
                         fontWeight: 700,
-                        fontSize: "0.75rem",
-                        height: 26,
-                        flexShrink: 0,
+                        fontSize: { xs: "0.6875rem", sm: "0.75rem" },
+                        height: { xs: 22, sm: 26 },
+                        "& .MuiChip-label": { px: { xs: 1, sm: 1.25 } },
                       }}
                     />
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Stack
-                        direction="row"
-                        alignItems="center"
-                        gap={1}
-                        flexWrap="wrap"
-                      >
-                        <Typography
-                          variant="subtitle1"
-                          fontWeight={700}
-                          sx={{
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical",
-                          }}
-                        >
-                          {notice.title}
-                        </Typography>
-                      </Stack>
-                    </Box>
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      spacing={0.5}
-                      sx={{ flexShrink: 0, color: "text.secondary" }}
+                    <Typography
+                      component="h3"
+                      sx={{
+                        gridArea: "title",
+                        minWidth: 0,
+                        fontWeight: 700,
+                        fontSize: { xs: "0.9375rem", sm: "1rem" },
+                        lineHeight: 1.5,
+                        wordBreak: "keep-all",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                      }}
                     >
-                      {/* <CalendarToday sx={{ fontSize: 18 }} /> */}
-                      <Typography
-                        variant="body2"
-                        component="span"
-                        sx={{ whiteSpace: "nowrap" }}
-                      >
-                        {formatDate(notice.created_at)}
-                      </Typography>
-                      <ChevronRight
-                        sx={{ fontSize: 22, color: "action.active", ml: 0.5 }}
-                      />
-                    </Stack>
+                      {notice.title}
+                    </Typography>
+                    <Typography
+                      component="time"
+                      dateTime={notice.created_at}
+                      sx={{
+                        gridArea: "date",
+                        color: "text.secondary",
+                        fontSize: { xs: "0.8125rem", sm: "0.875rem" },
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {formatDate(notice.created_at)}
+                    </Typography>
+                    <ChevronRight
+                      sx={{
+                        gridArea: "arrow",
+                        fontSize: { xs: 20, sm: 22 },
+                        color: "action.active",
+                      }}
+                    />
                   </Box>
                 </Link>
               </Box>

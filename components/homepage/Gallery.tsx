@@ -24,8 +24,8 @@ type Props = {
 /** 앨범(폴더) 카드 — 가로 스크롤 한 장 너비 */
 const cardSx = {
   flexShrink: 0,
-  width: { xs: 200, sm: 230, md: 270 },
-  height: { xs: 300, sm: 340, md: 380 },
+  width: { xs: 210, sm: 230, md: 270 },
+  height: { xs: 270, sm: 340, md: 380 },
   display: "flex",
   flexDirection: "column" as const,
   overflow: "hidden",
@@ -39,7 +39,7 @@ export default function Gallery({ albums }: Props) {
     const container = scrollContainerRef.current;
     if (!container || isPaused) return;
 
-    let scrollPosition = 0;
+    let scrollPosition = container.scrollLeft;
     const scrollSpeed = 0.5;
 
     const tick = () => {
@@ -63,8 +63,25 @@ export default function Gallery({ albums }: Props) {
     return () => clearInterval(intervalId);
   }, [isPaused]);
 
-  const handleMouseEnter = () => setIsPaused(true);
-  const handleMouseLeave = () => setIsPaused(false);
+  const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const pause = () => {
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    setIsPaused(true);
+  };
+  const resume = () => setIsPaused(false);
+  /** 터치로 넘긴 뒤에는 바로 움직이지 않고 잠시 후 이어서 자동 스크롤 */
+  const resumeLater = () => {
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(resume, 3000);
+  };
+
+  useEffect(
+    () => () => {
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    },
+    []
+  );
 
   return (
     <Box
@@ -77,13 +94,11 @@ export default function Gallery({ albums }: Props) {
       <Container maxWidth="lg">
         <Stack
           direction="row"
-          alignItems="flex-start"
+          alignItems="flex-end"
           justifyContent="space-between"
-          flexWrap="wrap"
           gap={2}
-          sx={{ mb: { xs: 3, md: 4 } }}
         >
-          <Box sx={{ textAlign: "left", flex: "1 1 280px", minWidth: 0 }}>
+          <Box sx={{ textAlign: "left", minWidth: 0 }}>
             <Typography
               variant="overline"
               sx={{
@@ -108,18 +123,6 @@ export default function Gallery({ albums }: Props) {
             >
               함께한 순간들
             </Typography>
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              sx={{
-                mt: 1.5,
-                maxWidth: 560,
-                lineHeight: 1.75,
-              }}
-            >
-              프로그램과 행사, 일상 현장에서 새해밀이 함께한 소중한 순간들을
-              앨범별로 모았습니다.
-            </Typography>
           </Box>
           <Link href="/gallery" style={{ textDecoration: "none" }}>
             <Button
@@ -131,9 +134,10 @@ export default function Gallery({ albums }: Props) {
                 color: "text.primary",
                 bgcolor: "#ffffff",
                 borderRadius: 2,
-                px: 2,
+                px: { xs: 1.5, sm: 2 },
+                fontSize: { xs: "0.8125rem", sm: "0.875rem" },
+                whiteSpace: "nowrap",
                 fontWeight: 600,
-                alignSelf: { xs: "stretch", sm: "flex-start" },
                 "&:hover": {
                   borderColor: ACCENT,
                   bgcolor: "#ffffff",
@@ -144,23 +148,41 @@ export default function Gallery({ albums }: Props) {
             </Button>
           </Link>
         </Stack>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{
+            mt: { xs: 1, md: 1.5 },
+            mb: { xs: 2.5, md: 4 },
+            maxWidth: 560,
+            lineHeight: 1.7,
+            fontSize: { xs: "0.9375rem", md: "1rem" },
+            wordBreak: "keep-all",
+          }}
+        >
+          프로그램과 행사, 일상 현장에서 새해밀이 함께한 소중한 순간들을
+          앨범별로 모았습니다.
+        </Typography>
 
         <Box
           ref={scrollContainerRef}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={pause}
+          onMouseLeave={resume}
+          onTouchStart={pause}
+          onTouchEnd={resumeLater}
           sx={{
             display: "flex",
             gap: { xs: 1.5, md: 2 },
             overflowX: "auto",
             scrollBehavior: "smooth",
-            pb: 2,
+            pb: { xs: 0.5, md: 2 },
             mx: { xs: -2, sm: -3, md: 0 },
             px: { xs: 2, sm: 3, md: 0 },
             cursor: "grab",
             "&:active": { cursor: "grabbing" },
-            scrollbarGutter: "stable",
-            "&::-webkit-scrollbar": { height: 8 },
+            scrollbarGutter: { md: "stable" },
+            scrollbarWidth: { xs: "none", md: "auto" },
+            "&::-webkit-scrollbar": { height: { xs: 0, md: 8 } },
             "&::-webkit-scrollbar-track": {
               background: "grey.200",
               borderRadius: 4,
