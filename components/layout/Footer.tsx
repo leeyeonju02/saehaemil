@@ -26,10 +26,11 @@ export default function Footer() {
           <Box sx={{ mb: 3 }}>
             <MuiLink
               component={Link}
-              href="#"
+              href="/privacy"
               sx={{
                 color: "rgba(255,255,255,0.8)",
                 textDecoration: "none",
+                fontWeight: 700,
                 fontSize: { xs: "0.95rem", md: "1rem" },
                 "&:hover": { color: "#fff" },
               }}
@@ -44,7 +45,7 @@ export default function Footer() {
             </Typography>
             <MuiLink
               component={Link}
-              href="#"
+              href="/terms"
               sx={{
                 color: "rgba(255,255,255,0.8)",
                 textDecoration: "none",
